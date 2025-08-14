@@ -6,11 +6,11 @@
     <parent>
         <groupId>com.ddf.common.cloud</groupId>
         <artifactId>cloud-haven</artifactId>
-        <version>1.0.1-jdk17-SNAPSHOT</version>
+        <version>1.0.1-boot302-SNAPSHOT</version>
     </parent>
 
     <artifactId>gateway</artifactId>
-    <version>1.0.1-jdk17-SNAPSHOT</version>
+    <version>1.0.1-boot302-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,12 +22,12 @@
         <dependency>
             <groupId>com.ddf.common.cloud</groupId>
             <artifactId>api</artifactId>
-            <version>1.0.1-jdk17-SNAPSHOT</version>
+            <version>1.0.1-boot302-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.ddf.common</groupId>
             <artifactId>ddf-common-core</artifactId>
-            <version>1.0.1-jdk17-SNAPSHOT</version>
+            <version>1.0.1-boot302-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

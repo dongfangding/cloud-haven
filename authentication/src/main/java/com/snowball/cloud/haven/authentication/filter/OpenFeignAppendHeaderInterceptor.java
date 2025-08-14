@@ -41,6 +41,5 @@ public class OpenFeignAppendHeaderInterceptor implements RequestInterceptor {
         template.header(RequestHeaderEnum.CLIENT_IP_FROM_GATEWAY.getName(), requestContext.getClientIpFromGateway());
         template.header(RequestHeaderEnum.USER_ID_FROM_GATEWAY.getName(), requestContext.getUserIdFromGateway());
         template.header(RequestHeaderEnum.IS_GATEWAY_DISPATCH.getName(), String.valueOf(ObjectUtils.defaultIfNull(requestContext.getIsGatewayDispatch(), false)));
-        template.header(RequestHeaderEnum.IS_CONSOLE_WHITELIST_IMEI.getName(), String.valueOf(ObjectUtils.defaultIfNull(requestContext.getIsConsoleWhitelistImei(), false)));
     }
 }

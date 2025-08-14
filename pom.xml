@@ -5,7 +5,7 @@
     <groupId>com.ddf.common.cloud</groupId>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-haven</artifactId>
-    <version>1.0.1-jdk17-SNAPSHOT</version>
+    <version>1.0.1-boot302-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!--
@@ -13,11 +13,11 @@
     https://github.com/alibaba/spring-cloud-alibaba/wiki/%E7%89%88%E6%9C%AC%E8%AF%B4%E6%98%8E
     推荐使用
     spring-cloud-alibaba    spring-cloud                spring-boot
-    2021.0.5.0*             Spring Cloud 2021.0.5       2.6.13
+    2022.0.0.0              2022.0.0                    3.0.2
 
     同时要注意的是安装的spring-cloud-alibaba的组件版本要对应上，关系如下，否则不保证可用
     Spring Cloud Alibaba Version	Sentinel Version	Nacos Version	RocketMQ Version	Dubbo Version	Seata Version
-    2021.0.5.0                      1.8.6               2.2.0           4.9.4                 ~              1.6.1
+    2022.0.0.0                      1.8.6               2.2.1           4.9.4             ~                 1.7.0
     -->
     <properties>
         <java.version>17</java.version>
@@ -25,16 +25,16 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <spring-boot-maven-plugin.version>2.6.13</spring-boot-maven-plugin.version>
-        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
         <maven.archetype.plugin.version>3.0.1</maven.archetype.plugin.version>
         <maven.javadoc.plugin.version>3.0.0</maven.javadoc.plugin.version>
         <maven.sonar.plugin.version>3.5.0.1254</maven.sonar.plugin.version>
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
-        <spring.cloud.version>2021.0.5</spring.cloud.version>
-        <spring.cloud.alibaba.version>2021.0.5.0</spring.cloud.alibaba.version>
-        <ddf-common.version>1.0.1-jdk17-SNAPSHOT</ddf-common.version>
+        <spring.cloud.version>2022.0.0</spring.cloud.version>
+        <spring.cloud.alibaba.version>2022.0.0.0</spring.cloud.alibaba.version>
+        <ddf-common.version>1.0.1-boot302-SNAPSHOT</ddf-common.version>
         <disruptor.version>3.4.4</disruptor.version>
     </properties>
 
@@ -73,15 +73,72 @@
     <!--            &lt;!&ndash; 注意这里的id要和settings.xml中配置servers节点下的server里的id一致，因为要找到对应的账号信息 &ndash;&gt;-->
     <!--            <id>aiyu_release</id>-->
     <!--            <name>Release Repository of nexus_release</name>-->
-    <!--            <url>http://121.41.123.212:8802/repository/aiyu_release/</url>-->
+    <!--            <url>http://xxxx:8802/repository/aiyu_release/</url>-->
     <!--        </repository>-->
 
     <!--        <snapshotRepository>-->
     <!--            <id>aiyu_snapshot</id>-->
     <!--            <name>Snapshot Repository of nexus_snapshot</name>-->
-    <!--            <url>http://121.41.123.212:8802/repository/aiyu_snapshot/</url>-->
+    <!--            <url>http://xxxx:8802/repository/aiyu_snapshot/</url>-->
     <!--        </snapshotRepository>-->
     <!--    </distributionManagement>-->
+
+    <repositories>
+        <!--        <repository>-->
+        <!--            <id>aiyu_public</id>-->
+        <!--            &lt;!&ndash; 这里要和settings里的mirrors节点下的某一个mirror的url对应起来， 一般在settings.xml中配置的这个地址，都是在nexus中的一个group地址，-->
+        <!--             然后将自己私服的release库地址和snapshot库地址都添加到这个组中， 即上面<distributionManagement>下<repository>和<snapshotRepository>&ndash;&gt;-->
+        <!--            <url>http://xxxx:8802/repository/aiyu_public/</url>-->
+        <!--            <releases>-->
+        <!--                <enabled>true</enabled>-->
+        <!--            </releases>-->
+        <!--            <snapshots>-->
+        <!--                <enabled>true</enabled>-->
+        <!--                <updatePolicy>always</updatePolicy>-->
+        <!--                <checksumPolicy>fail</checksumPolicy>-->
+        <!--            </snapshots>-->
+        <!--        </repository>-->
+        <repository>
+            <id>aliyun</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <!--        <pluginRepository>-->
+        <!--            <id>aiyu_public</id>-->
+        <!--            <url>http://xxxx:8802/repository/aiyu_public/</url>-->
+        <!--            <releases>-->
+        <!--                <enabled>true</enabled>-->
+        <!--            </releases>-->
+        <!--            <snapshots>-->
+        <!--                <enabled>true</enabled>-->
+        <!--                <updatePolicy>always</updatePolicy>-->
+        <!--                <checksumPolicy>fail</checksumPolicy>-->
+        <!--            </snapshots>-->
+        <!--        </pluginRepository>-->
+        <pluginRepository>
+            <id>aliyun</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
 
     <modules>
@@ -89,7 +146,6 @@
         <module>core</module>
         <module>authentication</module>
         <module>gateway</module>
-        <module>alarm</module>
     </modules>
 
     <build>

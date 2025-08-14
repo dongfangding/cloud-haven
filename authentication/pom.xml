@@ -6,17 +6,17 @@
     <parent>
         <groupId>com.ddf.common.cloud</groupId>
         <artifactId>cloud-haven</artifactId>
-        <version>1.0.1-jdk17-SNAPSHOT</version>
+        <version>1.0.1-boot302-SNAPSHOT</version>
     </parent>
 
     <artifactId>authentication</artifactId>
-    <version>1.0.1-jdk17-SNAPSHOT</version>
+    <version>1.0.1-boot302-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <cloud-api.version>1.0.1-jdk17-SNAPSHOT</cloud-api.version>
+        <cloud-api.version>1.0.1-boot302-SNAPSHOT</cloud-api.version>
     </properties>
 
     <dependencies>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.ddf.common</groupId>
             <artifactId>ddf-common-mvc</artifactId>
-            <version>1.0.1-jdk17-SNAPSHOT</version>
+            <version>1.0.1-boot302-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

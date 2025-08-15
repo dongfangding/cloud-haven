@@ -5,7 +5,7 @@
     <groupId>com.ddf.common.cloud</groupId>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-haven</artifactId>
-    <version>1.0.1-boot302-SNAPSHOT</version>
+    <version>boot302-2025.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!--
@@ -34,7 +34,7 @@
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <spring.cloud.version>2022.0.0</spring.cloud.version>
         <spring.cloud.alibaba.version>2022.0.0.0</spring.cloud.alibaba.version>
-        <ddf-common.version>1.0.1-boot302-SNAPSHOT</ddf-common.version>
+        <ddf-common.version>boot302-2025.1.0-SNAPSHOT</ddf-common.version>
         <disruptor.version>3.4.4</disruptor.version>
     </properties>
 

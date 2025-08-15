@@ -85,7 +85,6 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
                 .version(request.getHeader(RequestHeaderEnum.VERSION.getName()))
                 .appLanguage(request.getHeader(RequestHeaderEnum.APP_LANGUAGE.getName()))
                 .systemLanguage(request.getHeader(RequestHeaderEnum.SYSTEM_LANGUAGE.getName()))
-                .simOperator(request.getHeader(RequestHeaderEnum.SIM_OPERATOR.getName()))
                 .useProxy(Boolean.parseBoolean(request.getHeader(RequestHeaderEnum.USE_PROXY.getName())))
                 .useVpn(Boolean.parseBoolean(request.getHeader(RequestHeaderEnum.USE_VPN.getName())))
                 .timeZone(request.getHeader(RequestHeaderEnum.TIME_ZONE.getName()))
@@ -93,7 +92,6 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
                 .deviceMode(request.getHeader(RequestHeaderEnum.DEVICE_MODE.getName()))
                 .h5Version(request.getHeader(RequestHeaderEnum.H5_VERSION.getName()))
                 .iosIdfa(request.getHeader(RequestHeaderEnum.IOS_IDFA.getName()))
-                .oaId(request.getHeader(RequestHeaderEnum.OA_ID.getName()))
                 .androidId(request.getHeader(RequestHeaderEnum.ANDROID_ID.getName()))
                 .requestUri(request.getRequestURI())
                 .clientIp(request.getHeader(RequestHeaderEnum.CLIENT_IP.getName()))
@@ -103,10 +101,6 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
                                 "false"
                         )))
                 .userIdFromGateway(request.getHeader(RequestHeaderEnum.USER_ID_FROM_GATEWAY.getName()))
-                .isConsoleWhitelistImei(Boolean.parseBoolean(StringUtils.defaultIfBlank(
-                        request.getHeader(RequestHeaderEnum.IS_CONSOLE_WHITELIST_IMEI.getName()), "false")))
-                .isBanned(Boolean.parseBoolean(
-                        StringUtils.defaultIfBlank(request.getHeader(RequestHeaderEnum.IS_BANNED.getName()), "false")))
                 .isSimulator(Boolean.parseBoolean(
                         StringUtils.defaultIfBlank(request.getHeader(RequestHeaderEnum.SIMULATOR.getName()), "false")))
                 .build());

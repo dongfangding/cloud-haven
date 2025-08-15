@@ -120,9 +120,9 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        final ServerHttpRequest request = exchange.getRequest();
+        final HttpHeaders headers = request.getHeaders();
         try {
-            final ServerHttpRequest request = exchange.getRequest();
-            final HttpHeaders headers = request.getHeaders();
             // 通用请求头解析
             final Map<String, String> clientHeaderMap = resolveClientHeaders(request, headers, null);
             // 自定义请求头解析， 处理过程中可以额外添加请求头，最终会被统一添加到请求头中
@@ -143,7 +143,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
             final Map<String, RequestHeaderEnum> requiredClientHeaders = RequestHeaderEnum.getRequiredClientHeaders();
             for (String name : requiredClientHeaders.keySet()) {
                 if (StringUtils.isBlank(headers.getFirst(name))) {
-                    return responseErrorJson(exchange.getResponse(), BaseErrorCallbackCode.ILLEGAL_REQUEST);
+                    return responseErrorJson(headers, exchange.getResponse(), BaseErrorCallbackCode.ILLEGAL_REQUEST);
                 }
             }
             // 自定义
@@ -160,13 +160,22 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
                 try {
                     userClaim = checkAndParseAuthInfo(exchange, token);
                 } catch (BaseException e) {
-                    return responseErrorJson(exchange.getResponse(), e.getCode(), e.getMessage());
+                    return responseErrorJson(
+                            headers, exchange.getResponse(),
+                            BaseCallbackCode.DefaultBaseCallbackCode.of(e.getCode(), e.getMessage())
+                    );
                 } catch (Exception e) {
-                    return responseErrorJson(exchange.getResponse(), "500", "server error~");
+                    return responseErrorJson(
+                            headers, exchange.getResponse(),
+                            BaseCallbackCode.DefaultBaseCallbackCode.of(
+                                    "500", "server error", "Failed, please contact customer service")
+                    );
                 }
                 if (Objects.isNull(userClaim)) {
                     return responseErrorJson(
-                            exchange.getResponse(), GatewayExceptionCode.USER_INFO_EXPIRED_OR_NOT_EXIST);
+                            headers, exchange.getResponse(),
+                            GatewayExceptionCode.USER_INFO_EXPIRED_OR_NOT_EXIST
+                    );
                 }
             }
             // 添加服务端请求头
@@ -176,7 +185,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
             final long nonce = Long.parseLong(
                     Objects.requireNonNull(headers.getFirst(RequestHeaderEnum.NONCE.getName())));
             if (nonce < System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5)) {
-                return responseErrorJson(exchange.getResponse(), BaseErrorCallbackCode.SIGN_TIMESTAMP_ERROR);
+                return responseErrorJson(headers, exchange.getResponse(), BaseErrorCallbackCode.SIGN_TIMESTAMP_ERROR);
             }
 
             // 签名校验
@@ -190,10 +199,11 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
             return resolveQueryParamsSignData(exchange, chain, userClaim, clientHeaderMap, customizeHeaderMap);
         } catch (Exception e) {
             if (e instanceof BusinessException) {
-                return responseErrorJson(exchange.getResponse(), ((BusinessException) e).getBaseCallbackCode());
+                return responseErrorJson(
+                        headers, exchange.getResponse(), ((BusinessException) e).getBaseCallbackCode());
             }
             log.error("网关处理异常", e);
-            return responseErrorJson(exchange.getResponse(), GatewayExceptionCode.GATEWAY_ERROR);
+            return responseErrorJson(headers, exchange.getResponse(), GatewayExceptionCode.GATEWAY_ERROR);
         }
     }
 
@@ -271,7 +281,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
         final String sign = headers.getFirst(RequestHeaderEnum.SIGN.getName());
         if (!"111111".equals(sign) && cloudAuthenticationProperties.isSignEnabled()
                 && !SignatureUtil.verifySelfSignature(data, sign, cloudAuthenticationProperties.getSignSecret())) {
-            return responseErrorJson(exchange.getResponse(), BaseErrorCallbackCode.SIGN_ERROR);
+            return responseErrorJson(headers, exchange.getResponse(), BaseErrorCallbackCode.SIGN_ERROR);
         }
         // 分发服务前
         final ResponseData<Object> responseData = userClaimService.beforeDispatch(
@@ -336,12 +346,22 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
                 RequestHeaderEnum.TRACE_ID_FROM_GATEWAY.getName(), generateTraceId(
                         Objects.nonNull(userClaim) ? userClaim.getUserId() : headers.getFirst(RequestHeaderEnum.IMEI.getName()))
         );
-        serverHeaderMap.put(
-                RequestHeaderEnum.IS_CONSOLE_WHITELIST_IMEI.getName(),
-                RequestHeaderEnum.IS_CONSOLE_WHITELIST_IMEI.getDefaultValue()
-        );
         return serverHeaderMap;
     }
+
+    private Map<String, Object> resolveAllClientHeader(HttpHeaders headers) {
+        Map<String, Object> allClientHeader = new HashMap<>();
+        try {
+            final Map<String, RequestHeaderEnum> mappings = RequestHeaderEnum.getAllMappings();
+            mappings.forEach((name, obj) -> {
+                allClientHeader.put(name, headers.getFirst(name));
+            });
+        } catch (Exception e) {
+            log.error("解析客户端请求头失败", e);
+        }
+        return allClientHeader;
+    }
+
 
     /**
      * 返回错误json信息
@@ -350,28 +370,15 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
      * @param bizCode
      * @return
      */
-    private Mono<Void> responseErrorJson(ServerHttpResponse response, BaseCallbackCode bizCode) {
+    private Mono<Void> responseErrorJson(HttpHeaders headers, ServerHttpResponse response, BaseCallbackCode bizCode) {
+        log.error(
+                "网关处理失败, code = {}, message = {}, headers = {}", bizCode.getCode(), bizCode.getDescription(),
+                resolveAllClientHeader(headers)
+        );
         response
                 .getHeaders()
                 .add("Content-Type", "application/json;charset=UTF-8");
         String result = JsonUtil.toJson(ResponseData.failure(bizCode));
-        DataBuffer buffer = response
-                .bufferFactory()
-                .wrap(result.getBytes(StandardCharsets.UTF_8));
-        return response.writeWith(Flux.just(buffer));
-    }
-
-    /**
-     * 返回错误json信息
-     *
-     * @param response
-     * @return
-     */
-    private Mono<Void> responseErrorJson(ServerHttpResponse response, String code, String message) {
-        response
-                .getHeaders()
-                .add("Content-Type", "application/json;charset=UTF-8");
-        String result = JsonUtil.toJson(ResponseData.failure(code, "Failed, please contact customer service", message));
         DataBuffer buffer = response
                 .bufferFactory()
                 .wrap(result.getBytes(StandardCharsets.UTF_8));
@@ -385,7 +392,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
      * @param data
      * @return
      */
-    public static Mono<Void> responseCustomizeMsg(ServerHttpResponse response, ResponseData<Object> data) {
+    public Mono<Void> responseCustomizeMsg(ServerHttpResponse response, ResponseData<Object> data) {
         response
                 .getHeaders()
                 .add("Content-Type", "application/json;charset=UTF-8");

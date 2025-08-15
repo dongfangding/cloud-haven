@@ -3,11 +3,11 @@
     <parent>
         <groupId>com.ddf.common.cloud</groupId>
         <artifactId>cloud-haven</artifactId>
-        <version>1.0.1-jdk17-SNAPSHOT</version>
+        <version>boot276-2025.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>core</artifactId>
-    <version>1.0.1-jdk17-SNAPSHOT</version>
+    <version>boot276-2025.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -21,17 +21,17 @@
         <dependency>
             <groupId>com.ddf.common.cloud</groupId>
             <artifactId>api</artifactId>
-            <version>1.0.1-jdk17-SNAPSHOT</version>
+            <version>boot276-2025.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.ddf.common</groupId>
             <artifactId>ddf-common-api</artifactId>
-            <version>1.0.1-jdk17-SNAPSHOT</version>
+            <version>boot276-2025.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.ddf.common</groupId>
             <artifactId>ddf-common-mvc</artifactId>
-            <version>1.0.1-jdk17-SNAPSHOT</version>
+            <version>boot276-2025.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

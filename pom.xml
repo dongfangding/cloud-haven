@@ -13,27 +13,27 @@
     https://github.com/alibaba/spring-cloud-alibaba/wiki/%E7%89%88%E6%9C%AC%E8%AF%B4%E6%98%8E
     推荐使用
     spring-cloud-alibaba    spring-cloud                spring-boot
-    2022.0.0.0              2022.0.0                    3.0.2
+    2025.0.0.0              2025.0.0                    3.5.x
 
     同时要注意的是安装的spring-cloud-alibaba的组件版本要对应上，关系如下，否则不保证可用
     Spring Cloud Alibaba Version	Sentinel Version	Nacos Version	RocketMQ Version	Dubbo Version	Seata Version
-    2022.0.0.0                      1.8.6               2.2.1           4.9.4             ~                 1.7.0
+    2025.0.0.0                    1.8.8               2.3.2           4.9.6             3.2.0            2.0.0
     -->
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <spring-boot-maven-plugin.version>2.6.13</spring-boot-maven-plugin.version>
-        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
-        <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
+        <spring-boot-maven-plugin.version>3.3.5</spring-boot-maven-plugin.version>
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.5.0</maven.surefire.plugin.version>
+        <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
         <maven.archetype.plugin.version>3.0.1</maven.archetype.plugin.version>
-        <maven.javadoc.plugin.version>3.0.0</maven.javadoc.plugin.version>
+        <maven.javadoc.plugin.version>3.10.1</maven.javadoc.plugin.version>
         <maven.sonar.plugin.version>3.5.0.1254</maven.sonar.plugin.version>
-        <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
-        <spring.cloud.version>2022.0.0</spring.cloud.version>
-        <spring.cloud.alibaba.version>2022.0.0.0</spring.cloud.alibaba.version>
+        <maven.release.plugin.version>3.0.1</maven.release.plugin.version>
+        <spring.cloud.version>2025.0.0</spring.cloud.version>
+        <spring.cloud.alibaba.version>2025.0.0.0</spring.cloud.alibaba.version>
         <ddf-common.version>boot302-2025.1.0-SNAPSHOT</ddf-common.version>
         <disruptor.version>3.4.4</disruptor.version>
     </properties>

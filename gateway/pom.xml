@@ -4,13 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.ddf.common.cloud</groupId>
+        <groupId>io.github.dongfangding</groupId>
         <artifactId>cloud-haven</artifactId>
-        <version>boot302-2025.1.0-SNAPSHOT</version>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>gateway</artifactId>
-    <version>boot302-2025.1.0-SNAPSHOT</version>
+    <version>${revision}</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,14 +21,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.ddf.common.cloud</groupId>
-            <artifactId>api</artifactId>
-            <version>boot302-2025.1.0-SNAPSHOT</version>
+            <groupId>io.github.dongfangding</groupId>
+            <artifactId>cloud-haven-api</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.ddf.common</groupId>
+            <groupId>io.github.dongfangding</groupId>
             <artifactId>ddf-common-core</artifactId>
-            <version>boot302-2025.1.0-SNAPSHOT</version>
+            <version>${ddf-common.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

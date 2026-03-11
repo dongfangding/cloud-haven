@@ -1,14 +1,14 @@
 package com.snowball.cloud.haven.gateway.interfaces.impl;
 
 
-import com.snowball.cloud.haven.api.CloudAuthenticationProperties;
-import com.snowball.cloud.haven.gateway.exception.GatewayExceptionCode;
-import com.snowball.cloud.haven.gateway.interfaces.TokenCustomizeCheckService;
-import com.snowball.cloud.haven.gateway.interfaces.UserClaimService;
 import com.ddf.boot.common.api.exception.UnauthorizedException;
 import com.ddf.boot.common.api.model.authentication.AuthenticateCheckResult;
 import com.ddf.boot.common.api.model.authentication.UserClaim;
 import com.ddf.boot.common.core.util.PreconditionUtil;
+import com.snowball.cloud.haven.api.CloudAuthenticationProperties;
+import com.snowball.cloud.haven.gateway.exception.GatewayExceptionCode;
+import com.snowball.cloud.haven.gateway.interfaces.TokenCustomizeCheckService;
+import com.snowball.cloud.haven.gateway.interfaces.UserClaimService;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import org.springframework.web.server.ServerWebExchange;
 /**
  * <p>description</p >
  *
- * @author snowball
+ * @author rebot
  * @version 1.0
  * @date 2022/05/27 21:56
  */

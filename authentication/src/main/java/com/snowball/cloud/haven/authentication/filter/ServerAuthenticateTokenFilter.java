@@ -4,13 +4,15 @@ package com.snowball.cloud.haven.authentication.filter;
 import com.ddf.boot.common.api.enums.OsEnum;
 import com.ddf.boot.common.api.model.common.dto.RequestContext;
 import com.ddf.boot.common.api.model.common.request.RequestHeaderEnum;
+import com.ddf.boot.common.api.util.UserContextUtil;
 import com.snowball.cloud.haven.authentication.config.AuthenticateConstant;
-import com.snowball.cloud.haven.authentication.util.UserContextUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  */
 @Slf4j
 @Component
+@Order(value = Ordered.HIGHEST_PRECEDENCE)
 public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
 
     /**
@@ -39,7 +42,8 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
         // 解析请求头
         resolveRequestContext(request);
         MDC.put(AuthenticateConstant.MDC_USER_ID, UserContextUtil.getUserId());
-        MDC.put(AuthenticateConstant.MDC_TRACE_ID,
+        MDC.put(
+                AuthenticateConstant.MDC_TRACE_ID,
                 request.getHeader(RequestHeaderEnum.TRACE_ID_FROM_GATEWAY.getName())
         );
         MDC.put(AuthenticateConstant.MDC_CLIENT_IP, UserContextUtil.getClientIpFromGateway());
@@ -83,26 +87,17 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
                 .versionCode(Integer.parseInt(
                         StringUtils.defaultIfBlank(request.getHeader(RequestHeaderEnum.VERSION_CODE.getName()), "0")))
                 .version(request.getHeader(RequestHeaderEnum.VERSION.getName()))
-                .appLanguage(request.getHeader(RequestHeaderEnum.APP_LANGUAGE.getName()))
-                .systemLanguage(request.getHeader(RequestHeaderEnum.SYSTEM_LANGUAGE.getName()))
-                .useProxy(Boolean.parseBoolean(request.getHeader(RequestHeaderEnum.USE_PROXY.getName())))
-                .useVpn(Boolean.parseBoolean(request.getHeader(RequestHeaderEnum.USE_VPN.getName())))
+                .language(request.getHeader(RequestHeaderEnum.LANGUAGE.getName()))
                 .timeZone(request.getHeader(RequestHeaderEnum.TIME_ZONE.getName()))
                 .osVersion(request.getHeader(RequestHeaderEnum.OS_VERSION.getName()))
                 .deviceMode(request.getHeader(RequestHeaderEnum.DEVICE_MODE.getName()))
-                .h5Version(request.getHeader(RequestHeaderEnum.H5_VERSION.getName()))
-                .iosIdfa(request.getHeader(RequestHeaderEnum.IOS_IDFA.getName()))
-                .androidId(request.getHeader(RequestHeaderEnum.ANDROID_ID.getName()))
                 .requestUri(request.getRequestURI())
                 .clientIp(request.getHeader(RequestHeaderEnum.CLIENT_IP.getName()))
                 .clientIpFromGateway(request.getHeader(RequestHeaderEnum.CLIENT_IP_FROM_GATEWAY.getName()))
                 .isGatewayDispatch(Boolean.parseBoolean(
-                        StringUtils.defaultIfBlank(request.getHeader(RequestHeaderEnum.IS_GATEWAY_DISPATCH.getName()),
-                                "false"
-                        )))
+                        StringUtils.defaultIfBlank(
+                                request.getHeader(RequestHeaderEnum.IS_GATEWAY_DISPATCH.getName()), "false")))
                 .userIdFromGateway(request.getHeader(RequestHeaderEnum.USER_ID_FROM_GATEWAY.getName()))
-                .isSimulator(Boolean.parseBoolean(
-                        StringUtils.defaultIfBlank(request.getHeader(RequestHeaderEnum.SIMULATOR.getName()), "false")))
                 .build());
     }
 }

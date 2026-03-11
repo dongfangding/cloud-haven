@@ -8,7 +8,7 @@ import org.springframework.web.server.ServerWebExchange;
 /**
  * <p>在通用的校验规则上可以实现该接口实现自己的校验规则</p >
  *
- * @author snowball
+ * @author rebot
  * @version 1.0
  * @date 2022/05/25 09:57
  */

@@ -2,11 +2,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <groupId>com.ddf.common.cloud</groupId>
-    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.github.dongfangding</groupId>
     <artifactId>cloud-haven</artifactId>
-    <version>boot302-2025.1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <version>${revision}</version>
     <packaging>pom</packaging>
+    <name>Spring Cloud骨架</name>
+    <description>基于https://github.com/dongfangding/ddf-common作为Spring Boot脚手架，构建起来的Spring Cloud骨架
+    </description>
+    <url>https://github.com/dongfangding/cloud-haven</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/dongfangding/cloud-haven</url>
+        <connection>scm:git:git://github.com/dongfangding/cloud-haven.git</connection>
+        <developerConnection>scm:git:ssh://github.com/dongfangding/cloud-haven.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>snowball</id>
+            <name>snowball</name>
+            <email>dongfang.ding1@gmail.com</email>
+            <organization>snowball</organization>
+        </developer>
+    </developers>
 
     <!--
     spring-boot spring-cloud spring-cloud-alibaba 版本依赖关系
@@ -14,28 +40,39 @@
     推荐使用
     spring-cloud-alibaba    spring-cloud                spring-boot
     2025.0.0.0              2025.0.0                    3.5.x
-
     同时要注意的是安装的spring-cloud-alibaba的组件版本要对应上，关系如下，否则不保证可用
-    Spring Cloud Alibaba Version	Sentinel Version	Nacos Version	RocketMQ Version	Dubbo Version	Seata Version
-    2025.0.0.0                    1.8.8               2.3.2           4.9.6             3.2.0            2.0.0
+    Spring Cloud Alibaba Version	Sentinel Version	Nacos Version	RocketMQ Version	Seata Version
+    2025.0.0.0                      1.8.9               3.0.3           5.3.1               2.5.0
     -->
     <properties>
-        <java.version>17</java.version>
+        <!-- Project revision -->
+        <revision>boot3.5-2025.1-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <spring-boot-maven-plugin.version>3.3.5</spring-boot-maven-plugin.version>
-        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.5.0</maven.surefire.plugin.version>
-        <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
-        <maven.archetype.plugin.version>3.0.1</maven.archetype.plugin.version>
-        <maven.javadoc.plugin.version>3.10.1</maven.javadoc.plugin.version>
-        <maven.sonar.plugin.version>3.5.0.1254</maven.sonar.plugin.version>
-        <maven.release.plugin.version>3.0.1</maven.release.plugin.version>
+        <maven.test.skip>true</maven.test.skip>
+        <!-- maven版本使用3.9.6以上版本 -->
+        <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
+        <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
+        <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
+        <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
+        <maven.archetype.plugin.version>3.3.0</maven.archetype.plugin.version>
+        <maven.javadoc.plugin.version>3.12.0</maven.javadoc.plugin.version>
+        <maven.release.plugin.version>3.3.0</maven.release.plugin.version>
+        <maven.deploy.plugin.version>3.1.4</maven.deploy.plugin.version>
+        <maven.sonar.plugin.version>5.5.0.6356</maven.sonar.plugin.version>
+        <!-- 发布插件版本 -->
+        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+        <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+        <flatten-maven-plugin.version>1.7.0</flatten-maven-plugin.version>
+        <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
+        <native-maven-plugin.version>0.10.6</native-maven-plugin.version>
+        <!-- 自身依赖pom版本 -->
         <spring.cloud.version>2025.0.0</spring.cloud.version>
         <spring.cloud.alibaba.version>2025.0.0.0</spring.cloud.alibaba.version>
-        <ddf-common.version>boot302-2025.1.0-SNAPSHOT</ddf-common.version>
-        <disruptor.version>3.4.4</disruptor.version>
+        <ddf-common.version>boot3.5-2025.1-SNAPSHOT</ddf-common.version>
     </properties>
 
     <!--维护依赖-->
@@ -58,7 +95,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.ddf.common</groupId>
+                <groupId>io.github.dongfangding</groupId>
                 <artifactId>ddf-common</artifactId>
                 <version>${ddf-common.version}</version>
                 <type>pom</type>
@@ -68,20 +105,13 @@
     </dependencyManagement>
 
 
-    <!--    <distributionManagement>-->
-    <!--        <repository>-->
-    <!--            &lt;!&ndash; 注意这里的id要和settings.xml中配置servers节点下的server里的id一致，因为要找到对应的账号信息 &ndash;&gt;-->
-    <!--            <id>aiyu_release</id>-->
-    <!--            <name>Release Repository of nexus_release</name>-->
-    <!--            <url>http://xxxx:8802/repository/aiyu_release/</url>-->
-    <!--        </repository>-->
+    <modules>
+        <module>api</module>
+        <module>core</module>
+        <module>authentication</module>
+        <module>gateway</module>
+    </modules>
 
-    <!--        <snapshotRepository>-->
-    <!--            <id>aiyu_snapshot</id>-->
-    <!--            <name>Snapshot Repository of nexus_snapshot</name>-->
-    <!--            <url>http://xxxx:8802/repository/aiyu_snapshot/</url>-->
-    <!--        </snapshotRepository>-->
-    <!--    </distributionManagement>-->
 
     <repositories>
         <!--        <repository>-->
@@ -109,12 +139,12 @@
             </releases>
         </repository>
         <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>public</id>
+            <name>huawei nexus</name>
+            <url>https://mirrors.huaweicloud.com/repository/maven/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
         </repository>
     </repositories>
 
@@ -138,15 +168,26 @@
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/release</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>public</id>
+            <name>huawei nexus</name>
+            <url>https://mirrors.huaweicloud.com/repository/maven/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
     </pluginRepositories>
 
-
-    <modules>
-        <module>api</module>
-        <module>core</module>
-        <module>authentication</module>
-        <module>gateway</module>
-    </modules>
 
     <build>
         <pluginManagement>
@@ -154,7 +195,7 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring-boot-maven-plugin.version}</version>
+                    <version>${spring-boot.version}</version>
                     <configuration>
                         <excludes>
                             <exclude>
@@ -162,8 +203,9 @@
                                 <artifactId>spring-boot-configuration-processor</artifactId>
                             </exclude>
                         </excludes>
-                        <fork>true</fork>
-                        <classifier>exec</classifier>
+                        <image>
+                            <builder>paketobuildpacks/builder-optimised:latest</builder>
+                        </image>
                     </configuration>
                     <executions>
                         <execution>
@@ -177,13 +219,34 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <parameters>true</parameters>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <release>${java.version}</release>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </path>
+                        </annotationProcessorPaths>
+                        <compilerArgs>
+                            <arg>-parameters</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>${maven.source.plugin.version}</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
-                            <!--<phase>verify</phase>-->
-                            <phase>install</phase>
+                            <phase>verify</phase>
                             <goals>
                                 <goal>jar-no-fork</goal>
                             </goals>
@@ -193,57 +256,116 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.plugin.version}</version>
-                    <configuration>
-                        <source>${maven.compiler.source}</source>
-                        <target>${maven.compiler.target}</target>
-                        <encoding>${project.build.sourceEncoding}</encoding>
-                        <compilerArgument>-parameters</compilerArgument>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
-                        <includes>
-                            <skip>true</skip>
-                        </includes>
+                        <testFailureIgnore>true</testFailureIgnore>
+                        <argLine>-Djdk.traceVirtualThreadLocals=false</argLine>
                     </configuration>
                 </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>${maven.release.plugin.version}</version>
-                    <configuration>
-                        <tagNameFormat>v@{project.version}</tagNameFormat>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-archetype-plugin</artifactId>
-                    <version>${maven.archetype.plugin.version}</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${maven.javadoc.plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <phase>deploy</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
+    <!-- 默认不启动发布插件，当需要的时候，激活这个profile -->
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Javadoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven-javadoc-plugin.version}</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                            <source>${maven.compiler.source}</source>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- 用于发布到maven中央仓库的插件， 对文件进行gpg签名。如果要deploy到私服， 自己的项目里不要引用这个 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>flatten-maven-plugin</artifactId>
+                        <version>${flatten-maven-plugin.version}</version>
+                        <configuration>
+                            <updatePomFile>true</updatePomFile>
+                            <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>flatten</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>flatten</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>flatten.clean</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>clean</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- 用于发布到maven中央仓库的插件，将文件推送到中央仓库，使用该插件，不需要在distributionManagement中配置仓库地址。如果要deploy到私服， 自己的项目里不要引用这个 -->
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${central-publishing-maven-plugin.version}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <!-- publishingServerId里的值要对应本地settings.xml中的server认证信息的id， 用户名和密码要真实到中央仓库账号注册过 -->
+                            <publishingServerId>snowball</publishingServerId>
+                            <!-- 自动发布， 否则就要登录账号收到点击发布 -->
+                            <autoPublish>false</autoPublish>
+                            <excludeArtifacts>
+                                <!-- 排除的Artifact，比如有example模块是 -->
+                                <excludeArtifact>ddf-common-script</excludeArtifact>
+                            </excludeArtifacts>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

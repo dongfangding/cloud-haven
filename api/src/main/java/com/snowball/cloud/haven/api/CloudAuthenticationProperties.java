@@ -35,7 +35,7 @@ public class CloudAuthenticationProperties {
     /**
      * token header name, 控制客户端通过哪个header传token
      */
-    private String tokenHeaderName = "access_token";
+    private String tokenHeaderName = "Access-Token";
 
     /**
      * token的value前缀, 控制token是不是包含前缀，token本身不包含，客户端传送过来的时候要包含
@@ -65,22 +65,9 @@ public class CloudAuthenticationProperties {
     private Integer expiredMinute;
 
     /**
-     * 是否开启mock登录用户功能， 如果开启的话，那么则不会走token解析流程，也不走认证流程，而是把token直接作为用户id放入到上下文中直接使用,
-     * 则当前请求可以直接非常简单的用对应身份进行操作
-     * 需要注意，这个token 仍然需要保持原token格式， 即
-     * Authorization：Bearer 1 则当前用户id为1
+     * 32位加签秘钥
      */
-    private boolean mock;
-
-    /**
-     * 为安全起见，必须配置在其中的mock用户才能使用
-     */
-    private List<String> mockUserIdList;
-
-    /**
-     * 加签秘钥
-     */
-    private String signSecret = "abcdefghijklmnopqrstuvw987654321";
+    private String signSecret;
 
     /**
      * 加签验证是否开启

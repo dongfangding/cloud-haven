@@ -1,7 +1,6 @@
 package com.snowball.cloud.haven.gateway.handler;
 
 
-import cn.hutool.core.collection.CollUtil;
 import com.ddf.boot.common.api.exception.BaseCallbackCode;
 import com.ddf.boot.common.api.exception.BaseErrorCallbackCode;
 import com.ddf.boot.common.api.exception.BaseException;
@@ -33,7 +32,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.factory.rewrite.CachedBodyOutputMessage;
@@ -47,6 +47,7 @@ import org.springframework.http.codec.CodecConfigurer;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -62,14 +63,11 @@ import reactor.core.publisher.Mono;
  * @since 2023/07/23 10:21
  */
 @Slf4j
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
+@Component
 public class CloudHavenGatewayFilter implements GlobalFilter {
-
-    public static final String BEAN_NAME = "PanguGatewayFilter";
-
     private final CloudAuthenticationProperties cloudAuthenticationProperties;
-    private final EnvironmentHelper environmentHelper;
-    private final UserClaimService userClaimService;
+    private final ObjectProvider<UserClaimService> userClaimServiceObjectProvider;
     private final TokenCustomizeCheckService tokenCustomizeCheckService;
     private final CodecConfigurer codecConfigurer;
 
@@ -146,6 +144,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
                     return responseErrorJson(headers, exchange.getResponse(), BaseErrorCallbackCode.ILLEGAL_REQUEST);
                 }
             }
+            final UserClaimService userClaimService = getUserClaimService();
             // 自定义
             final ResponseData<Object> responseData = userClaimService.beforeTokenVerify(
                     exchange, clientHeaderMap, customizeHeaderMap);
@@ -192,8 +191,9 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
             MediaType mediaType = request
                     .getHeaders()
                     .getContentType();
+            // 适合 JSON 和 Form 提交的请求
             if (MediaType.APPLICATION_FORM_URLENCODED.isCompatibleWith(mediaType)
-                    || MediaType.APPLICATION_JSON.isCompatibleWith(mediaType)) { // 适合 JSON 和 Form 提交的请求
+                    || MediaType.APPLICATION_JSON.isCompatibleWith(mediaType)) {
                 return resolveBodySignData(exchange, chain, userClaim, clientHeaderMap, customizeHeaderMap);
             }
             return resolveQueryParamsSignData(exchange, chain, userClaim, clientHeaderMap, customizeHeaderMap);
@@ -283,6 +283,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
                 && !SignatureUtil.verifySelfSignature(data, sign, cloudAuthenticationProperties.getSignSecret())) {
             return responseErrorJson(headers, exchange.getResponse(), BaseErrorCallbackCode.SIGN_ERROR);
         }
+        final UserClaimService userClaimService = getUserClaimService();
         // 分发服务前
         final ResponseData<Object> responseData = userClaimService.beforeDispatch(
                 exchange, chain, userClaim, headerMap, customizeHeaderMap);
@@ -422,20 +423,10 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
         if (StringUtils.isNotBlank(cloudAuthenticationProperties.getTokenPrefix())) {
             token = tokenHeader.split(tokenPrefix)[1];
         }
-        UserClaim storeUser;
-        if (cloudAuthenticationProperties.isMock() && !environmentHelper.isProdProfile() && CollUtil.isNotEmpty(
-                cloudAuthenticationProperties.getMockUserIdList()) && cloudAuthenticationProperties
-                .getMockUserIdList()
-                .contains(token)) {
-            tokenUserClaim = UserClaim.mockUser(token);
-            storeUser = userClaimService.getStoreUserInfo(exchange, tokenUserClaim);
-        } else {
-            AuthenticateCheckResult authenticateCheckResult = TokenUtil.checkToken(token);
-            tokenUserClaim = authenticateCheckResult.getUserClaim();
-            // 额外业务token校验规则
-            storeUser = tokenCustomizeCheckService.customizeCheck(exchange, authenticateCheckResult);
-        }
-        return storeUser;
+        AuthenticateCheckResult authenticateCheckResult = TokenUtil.checkToken(token);
+        tokenUserClaim = authenticateCheckResult.getUserClaim();
+        // 额外业务token校验规则
+        return tokenCustomizeCheckService.customizeCheck(exchange, authenticateCheckResult);
     }
 
     /**
@@ -484,4 +475,16 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
         };
     }
 
+    /**
+     * 获取用户认证service
+     *
+     * @return
+     */
+    public UserClaimService getUserClaimService() {
+        final UserClaimService userClaimService = userClaimServiceObjectProvider.getIfAvailable();
+        if (Objects.isNull(userClaimService)) {
+            throw new NoSuchBeanDefinitionException("UserClaimService not config");
+        }
+        return userClaimService;
+    }
 }

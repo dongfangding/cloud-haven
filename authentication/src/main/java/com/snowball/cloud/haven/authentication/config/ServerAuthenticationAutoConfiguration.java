@@ -4,6 +4,8 @@ package com.snowball.cloud.haven.authentication.config;
 import com.snowball.cloud.haven.authentication.filter.ServerAuthenticateTokenFilter;
 import com.snowball.cloud.haven.api.CloudAuthenticationProperties;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -20,16 +22,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 @ComponentScan(basePackages = "com.snowball.cloud.haven.authentication")
+@RequiredArgsConstructor
 public class ServerAuthenticationAutoConfiguration implements WebMvcConfigurer {
 
-    @Autowired(required = false)
-    private ServerAuthenticateTokenFilter authenticateTokenFilter;
+    private final ObjectProvider<ServerAuthenticateTokenFilter> authenticateTokenFilterProvider;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        if (Objects.nonNull(authenticateTokenFilter)) {
-            registry.addInterceptor(authenticateTokenFilter).addPathPatterns("/**");
-        }
+        authenticateTokenFilterProvider.ifAvailable(filter -> {
+            registry.addInterceptor(filter)
+                    .addPathPatterns("/**");
+        });
     }
 
     @Bean

@@ -4,26 +4,27 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.ddf.common.cloud</groupId>
+        <groupId>io.github.dongfangding</groupId>
         <artifactId>cloud-haven</artifactId>
-        <version>boot302-2025.1.0-SNAPSHOT</version>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>authentication</artifactId>
-    <version>boot302-2025.1.0-SNAPSHOT</version>
+    <version>${revision}</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <cloud-api.version>boot302-2025.1.0-SNAPSHOT</cloud-api.version>
+        <cloud-api.version>${revision}</cloud-api.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.ddf.common.cloud</groupId>
-            <artifactId>api</artifactId>
-            <version>${cloud-api.version}</version>
+            <groupId>io.github.dongfangding</groupId>
+            <artifactId>cloud-haven-api</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -34,9 +35,9 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ddf.common</groupId>
+            <groupId>io.github.dongfangding</groupId>
             <artifactId>ddf-common-mvc</artifactId>
-            <version>boot302-2025.1.0-SNAPSHOT</version>
+            <version>${ddf-common.version}</version>
         </dependency>
     </dependencies>
 

@@ -13,7 +13,6 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -25,7 +24,7 @@ import org.springframework.web.server.ServerWebExchange;
  * @date 2022/05/27 21:56
  */
 @Slf4j
-@RequiredArgsConstructor(onConstructor_ = {@Autowired})
+@RequiredArgsConstructor
 public class DefaultTokenCheckServiceImpl implements TokenCustomizeCheckService {
 
     private final CloudAuthenticationProperties cloudAuthenticationProperties;
@@ -36,18 +35,19 @@ public class DefaultTokenCheckServiceImpl implements TokenCustomizeCheckService 
      *
      * @param exchange
      * @param authenticateCheckResult
-     * @return
      */
     @Override
     public UserClaim customizeCheck(ServerWebExchange exchange, AuthenticateCheckResult authenticateCheckResult) {
         final HttpHeaders headers = exchange.getRequest().getHeaders();
         final UserClaim tokenUserClaim = authenticateCheckResult.getUserClaim();
-        PreconditionUtil.checkArgument(Objects.nonNull(tokenUserClaim), GatewayExceptionCode.USER_INFO_EXPIRED_OR_NOT_EXIST);
-        PreconditionUtil.checkArgument(!StringUtils.isAnyBlank(tokenUserClaim.getUsername(), tokenUserClaim.getCredit()),
+        PreconditionUtil.checkArgument(Objects.nonNull(tokenUserClaim),
+                GatewayExceptionCode.USER_INFO_EXPIRED_OR_NOT_EXIST);
+        PreconditionUtil.checkArgument(
+                !StringUtils.isAnyBlank(tokenUserClaim.getUsername(), tokenUserClaim.getCredit()),
                 GatewayExceptionCode.USER_INFO_EXPIRED_OR_NOT_EXIST);
         // credit校验
-        final String credit = StringUtils.defaultIfBlank(headers.getFirst(cloudAuthenticationProperties.getCreditHeaderName()),
-                headers.getFirst("User-Agent"));
+        final String credit = StringUtils.defaultIfBlank(
+                headers.getFirst(cloudAuthenticationProperties.getCreditHeaderName()), headers.getFirst("User-Agent"));
         if (Objects.nonNull(tokenUserClaim.getCredit()) && !Objects.equals(tokenUserClaim.getCredit(), credit)) {
             log.error("当前请求credit和token不匹配， 当前: {}, token: {}", credit, tokenUserClaim.getCredit());
             throw new UnauthorizedException(GatewayExceptionCode.USER_INFO_EXPIRED_OR_NOT_EXIST);

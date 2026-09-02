@@ -24,13 +24,14 @@ mvn clean install -Dmaven.javadoc.skip=true -Dgpg.skip=true
 # 版本依赖
 
 ## Spring Cloud Alibaba组件
+
 Spring Cloud Alibaba的版本选择的是2025.0.0.0， 如果要使用Spring Cloud Alibaba相关组件，遵循如下版本
 
-| 依赖                           | 版本         | 
-|------------------------------|------------|
-| Nacos Version                | 3.0.3      |
-| Sentinel Version             | 1.8.9      |
-| RocketMQ Version             | 5.3.1      |
-| Seata Version                | 2.5.0      |
+| 依赖               | 版本    | 
+|------------------|-------|
+| Nacos Version    | 3.0.3 |
+| Sentinel Version | 1.8.9 |
+| RocketMQ Version | 5.3.1 |
+| Seata Version    | 2.5.0 |
     				
                                                                   

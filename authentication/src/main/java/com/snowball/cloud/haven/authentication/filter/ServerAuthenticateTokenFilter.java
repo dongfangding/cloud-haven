@@ -33,8 +33,6 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
      * @param request
      * @param response
      * @param handler
-     * @return
-     * @throws Exception
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -42,10 +40,8 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
         // 解析请求头
         resolveRequestContext(request);
         MDC.put(AuthenticateConstant.MDC_USER_ID, UserContextUtil.getUserId());
-        MDC.put(
-                AuthenticateConstant.MDC_TRACE_ID,
-                request.getHeader(RequestHeaderEnum.TRACE_ID_FROM_GATEWAY.getName())
-        );
+        MDC.put(AuthenticateConstant.MDC_TRACE_ID,
+                request.getHeader(RequestHeaderEnum.TRACE_ID_FROM_GATEWAY.getName()));
         MDC.put(AuthenticateConstant.MDC_CLIENT_IP, UserContextUtil.getClientIpFromGateway());
         MDC.put(AuthenticateConstant.MDC_IMEI, UserContextUtil.getImei());
         return true;
@@ -58,7 +54,6 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
      * @param response
      * @param handler
      * @param ex
-     * @throws Exception
      */
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
@@ -77,8 +72,7 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
      * @param request
      */
     public void resolveRequestContext(HttpServletRequest request) {
-        UserContextUtil.setRequestContext(RequestContext
-                .builder()
+        UserContextUtil.setRequestContext(RequestContext.builder()
                 .sign(request.getHeader(RequestHeaderEnum.SIGN.getName()))
                 .os(OsEnum.resolve(request.getHeader(RequestHeaderEnum.OS.getName())))
                 .imei(request.getHeader(RequestHeaderEnum.IMEI.getName()))
@@ -95,8 +89,8 @@ public class ServerAuthenticateTokenFilter implements HandlerInterceptor {
                 .clientIp(request.getHeader(RequestHeaderEnum.CLIENT_IP.getName()))
                 .clientIpFromGateway(request.getHeader(RequestHeaderEnum.CLIENT_IP_FROM_GATEWAY.getName()))
                 .isGatewayDispatch(Boolean.parseBoolean(
-                        StringUtils.defaultIfBlank(
-                                request.getHeader(RequestHeaderEnum.IS_GATEWAY_DISPATCH.getName()), "false")))
+                        StringUtils.defaultIfBlank(request.getHeader(RequestHeaderEnum.IS_GATEWAY_DISPATCH.getName()),
+                                "false")))
                 .userIdFromGateway(request.getHeader(RequestHeaderEnum.USER_ID_FROM_GATEWAY.getName()))
                 .build());
     }

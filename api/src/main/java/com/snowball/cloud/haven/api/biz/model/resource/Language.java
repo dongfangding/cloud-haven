@@ -51,8 +51,6 @@ public class Language {
 
     /**
      * 语言列表
-     *
-     * @return
      */
     public static List<Language> getLanguageList() {
         return LANGUAGE_LIST;
@@ -62,7 +60,6 @@ public class Language {
      * 根据code获取语言基本信息
      *
      * @param codeList
-     * @return
      */
     public static List<Language> exchangeLanguage(List<String> codeList) {
         return LANGUAGE_LIST.stream().filter(lan -> codeList.contains(lan.getCode())).toList();

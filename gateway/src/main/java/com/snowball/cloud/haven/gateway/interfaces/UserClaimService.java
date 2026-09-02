@@ -19,9 +19,8 @@ public interface UserClaimService {
      * 校验/解析token之前
      *
      * @param exchange
-     * @param clientHeaderMap    客户端传递的请求头
+     * @param clientHeaderMap 客户端传递的请求头
      * @param customizeHeaderMap 自定义的请求头
-     * @return
      */
     default ResponseData<Object> beforeTokenVerify(ServerWebExchange exchange, Map<String, String> clientHeaderMap,
             Map<String, String> customizeHeaderMap) {
@@ -31,10 +30,9 @@ public interface UserClaimService {
     /**
      * 认证校验后的操作
      *
-     * @param exchange  /**
-     *                  Jwt将token中的用户信息，传递给调用方，需要调用方实现这个接口来将数据库中的最新用户数据返回过来
+     * @param exchange /**
+     * Jwt将token中的用户信息，传递给调用方，需要调用方实现这个接口来将数据库中的最新用户数据返回过来
      * @param userClaim
-     * @return
      */
     UserClaim getStoreUserInfo(ServerWebExchange exchange, UserClaim userClaim);
 
@@ -61,7 +59,6 @@ public interface UserClaimService {
      * @param userClaim
      * @param headerMap
      * @param customizeHeaderMap
-     * @return
      */
     default ResponseData<Object> beforeDispatch(ServerWebExchange exchange, GatewayFilterChain chain,
             UserClaim userClaim, Map<String, String> headerMap, Map<String, String> customizeHeaderMap) {

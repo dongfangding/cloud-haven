@@ -18,8 +18,6 @@ public class ServiceConfig {
 
     /**
      * 负载均衡，服务调用
-     *
-     * @return
      */
     @Bean
     @LoadBalanced

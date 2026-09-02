@@ -22,10 +22,13 @@ public class OpenFeignAppendHeaderInterceptor implements RequestInterceptor {
     public void apply(RequestTemplate template) {
         final RequestContext requestContext = UserContextUtil.getRequestContext();
         // 如果是异步、甚至是MQ里面调用的话，这里是没有值的。
-        template.header(RequestHeaderEnum.OS.getName(), ObjectUtils.defaultIfNull(UserContextUtil.getOs(), OsEnum.UNKNOWN).name());
+        template.header(RequestHeaderEnum.OS.getName(),
+                ObjectUtils.defaultIfNull(UserContextUtil.getOs(), OsEnum.UNKNOWN).name());
         template.header(RequestHeaderEnum.IMEI.getName(), UserContextUtil.getImei());
-        template.header(RequestHeaderEnum.NONCE.getName(), String.valueOf(ObjectUtils.defaultIfNull(UserContextUtil.getNonce(), 0L)));
-        template.header(RequestHeaderEnum.VERSION_CODE.getName(), String.valueOf(ObjectUtils.defaultIfNull(UserContextUtil.getVersionCode(), 0L)));
+        template.header(RequestHeaderEnum.NONCE.getName(),
+                String.valueOf(ObjectUtils.defaultIfNull(UserContextUtil.getNonce(), 0L)));
+        template.header(RequestHeaderEnum.VERSION_CODE.getName(),
+                String.valueOf(ObjectUtils.defaultIfNull(UserContextUtil.getVersionCode(), 0L)));
         template.header(RequestHeaderEnum.VERSION.getName(), requestContext.getVersion());
         template.header(RequestHeaderEnum.LANGUAGE.getName(), UserContextUtil.getLanguage());
         template.header(RequestHeaderEnum.TIME_ZONE.getName(), requestContext.getTimeZone());
@@ -34,6 +37,7 @@ public class OpenFeignAppendHeaderInterceptor implements RequestInterceptor {
         template.header(RequestHeaderEnum.CLIENT_IP.getName(), requestContext.getClientIp());
         template.header(RequestHeaderEnum.CLIENT_IP_FROM_GATEWAY.getName(), requestContext.getClientIpFromGateway());
         template.header(RequestHeaderEnum.USER_ID_FROM_GATEWAY.getName(), requestContext.getUserIdFromGateway());
-        template.header(RequestHeaderEnum.IS_GATEWAY_DISPATCH.getName(), String.valueOf(ObjectUtils.defaultIfNull(requestContext.getIsGatewayDispatch(), false)));
+        template.header(RequestHeaderEnum.IS_GATEWAY_DISPATCH.getName(),
+                String.valueOf(ObjectUtils.defaultIfNull(requestContext.getIsGatewayDispatch(), false)));
     }
 }

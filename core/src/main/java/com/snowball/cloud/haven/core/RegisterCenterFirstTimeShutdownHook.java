@@ -2,7 +2,6 @@ package com.snowball.cloud.haven.core;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.serviceregistry.AbstractAutoServiceRegistration;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Component;
  * @version 1.0
  * @since 2023/09/18 15:18
  */
-@RequiredArgsConstructor(onConstructor_ = {@Autowired})
+@RequiredArgsConstructor
 @Slf4j
 @Order(value = Integer.MIN_VALUE + 10)
 @Component

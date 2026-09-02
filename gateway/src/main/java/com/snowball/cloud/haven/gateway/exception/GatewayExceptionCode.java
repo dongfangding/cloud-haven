@@ -23,10 +23,7 @@ public enum GatewayExceptionCode implements BaseCallbackCode {
     MOBILE_IN_BLACK("MOBILE_IN_BLACK", "手机号已被禁用~"),
     IMEI_IN_BLACK("IMEI_IN_BLACK", "设备已被禁用~"),
     IP_IN_BLACK("IP_IN_BLACK", "IP已被禁用~"),
-    CURRENT_REGION_NOT_SUPPORTED("CURRENT_REGION_NOT_SUPPORTED", "当前区域不支持")
-
-
-    ;
+    CURRENT_REGION_NOT_SUPPORTED("CURRENT_REGION_NOT_SUPPORTED", "当前区域不支持");
 
     private final String code;
 

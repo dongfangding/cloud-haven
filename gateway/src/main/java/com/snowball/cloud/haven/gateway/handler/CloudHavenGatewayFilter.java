@@ -11,8 +11,7 @@ import com.ddf.boot.common.api.model.authentication.UserClaim;
 import com.ddf.boot.common.api.model.common.request.RequestHeaderEnum;
 import com.ddf.boot.common.api.model.common.response.ResponseData;
 import com.ddf.boot.common.api.util.JsonUtil;
-import com.ddf.boot.common.core.authentication.TokenUtil;
-import com.ddf.boot.common.core.helper.EnvironmentHelper;
+import com.ddf.boot.common.core.authentication.TokenGenerator;
 import com.ddf.boot.common.core.util.GlobalAntMatcher;
 import com.ddf.boot.common.core.util.IdsUtil;
 import com.ddf.boot.common.core.util.SignatureUtil;
@@ -70,51 +69,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
     private final ObjectProvider<UserClaimService> userClaimServiceObjectProvider;
     private final TokenCustomizeCheckService tokenCustomizeCheckService;
     private final CodecConfigurer codecConfigurer;
-
-    /**
-     * 获取客户端请求ip
-     *
-     * @param request
-     * @return
-     */
-    public static String getClientIp(ServerHttpRequest request) {
-        final HttpHeaders headers = request.getHeaders();
-        String ip = headers.getFirst("X-Forwarded-For");
-        if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip) && ip.contains(",")) {
-            ip = ip.split(",")[0];
-        }
-
-        if (isInvalidIp(ip)) {
-            ip = headers.getFirst("X-Real-IP");
-        }
-
-        if (isInvalidIp(ip)) {
-            ip = headers.getFirst("Proxy-Client-IP");
-        }
-
-        if (isInvalidIp(ip)) {
-            ip = headers.getFirst("WL-Proxy-Client-IP");
-        }
-
-        if (isInvalidIp(ip)) {
-            ip = headers.getFirst("HTTP_CLIENT_IP");
-        }
-
-        if (isInvalidIp(ip)) {
-            ip = headers.getFirst("HTTP_X_FORWARDED_FOR");
-        }
-        if (isInvalidIp(ip) && request.getRemoteAddress() != null) {
-            ip = request
-                    .getRemoteAddress()
-                    .getAddress()
-                    .getHostAddress();
-        }
-        return ip;
-    }
-
-    private static boolean isInvalidIp(String ip) {
-        return ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
-    }
+    private final TokenGenerator tokenGenerator;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -125,17 +80,12 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
             final Map<String, String> clientHeaderMap = resolveClientHeaders(request, headers, null);
             // 自定义请求头解析， 处理过程中可以额外添加请求头，最终会被统一添加到请求头中
             final Map<String, String> customizeHeaderMap = new HashMap<>();
-            final String uri = request
-                    .getURI()
-                    .getPath();
+            final String uri = request.getURI().getPath();
             final List<String> openIgnores = cloudAuthenticationProperties.getOpenIgnores();
             if (GlobalAntMatcher.match(openIgnores, uri)) {
                 final ServerHttpRequest.Builder mutate = request.mutate();
                 clientHeaderMap.forEach(mutate::header);
-                return chain.filter(exchange
-                        .mutate()
-                        .request(mutate.build())
-                        .build());
+                return chain.filter(exchange.mutate().request(mutate.build()).build());
             }
             // 必传请求头校验， 放在开放接口校验之后
             final Map<String, RequestHeaderEnum> requiredClientHeaders = RequestHeaderEnum.getRequiredClientHeaders();
@@ -146,8 +96,8 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
             }
             final UserClaimService userClaimService = getUserClaimService();
             // 自定义
-            final ResponseData<Object> responseData = userClaimService.beforeTokenVerify(
-                    exchange, clientHeaderMap, customizeHeaderMap);
+            final ResponseData<Object> responseData = userClaimService.beforeTokenVerify(exchange, clientHeaderMap,
+                    customizeHeaderMap);
             if (!responseData.isSuccess()) {
                 return responseCustomizeMsg(exchange.getResponse(), responseData);
             }
@@ -159,22 +109,16 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
                 try {
                     userClaim = checkAndParseAuthInfo(exchange, token);
                 } catch (BaseException e) {
-                    return responseErrorJson(
-                            headers, exchange.getResponse(),
-                            BaseCallbackCode.DefaultBaseCallbackCode.of(e.getCode(), e.getMessage())
-                    );
+                    return responseErrorJson(headers, exchange.getResponse(),
+                            BaseCallbackCode.DefaultBaseCallbackCode.of(e.getCode(), e.getMessage()));
                 } catch (Exception e) {
-                    return responseErrorJson(
-                            headers, exchange.getResponse(),
-                            BaseCallbackCode.DefaultBaseCallbackCode.of(
-                                    "500", "server error", "Failed, please contact customer service")
-                    );
+                    return responseErrorJson(headers, exchange.getResponse(),
+                            BaseCallbackCode.DefaultBaseCallbackCode.of("500", "server error",
+                                    "Failed, please contact customer service"));
                 }
                 if (Objects.isNull(userClaim)) {
-                    return responseErrorJson(
-                            headers, exchange.getResponse(),
-                            GatewayExceptionCode.USER_INFO_EXPIRED_OR_NOT_EXIST
-                    );
+                    return responseErrorJson(headers, exchange.getResponse(),
+                            GatewayExceptionCode.USER_INFO_EXPIRED_OR_NOT_EXIST);
                 }
             }
             // 添加服务端请求头
@@ -188,9 +132,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
             }
 
             // 签名校验
-            MediaType mediaType = request
-                    .getHeaders()
-                    .getContentType();
+            MediaType mediaType = request.getHeaders().getContentType();
             // 适合 JSON 和 Form 提交的请求
             if (MediaType.APPLICATION_FORM_URLENCODED.isCompatibleWith(mediaType)
                     || MediaType.APPLICATION_JSON.isCompatibleWith(mediaType)) {
@@ -199,8 +141,8 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
             return resolveQueryParamsSignData(exchange, chain, userClaim, clientHeaderMap, customizeHeaderMap);
         } catch (Exception e) {
             if (e instanceof BusinessException) {
-                return responseErrorJson(
-                        headers, exchange.getResponse(), ((BusinessException) e).getBaseCallbackCode());
+                return responseErrorJson(headers, exchange.getResponse(),
+                        ((BusinessException) e).getBaseCallbackCode());
             }
             log.error("网关处理异常", e);
             return responseErrorJson(headers, exchange.getResponse(), GatewayExceptionCode.GATEWAY_ERROR);
@@ -220,48 +162,36 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
         // 此处 codecConfigurer.getReaders() 的目的，是解决 spring.codec.max-in-memory-size 不生效
         ServerRequest serverRequest = ServerRequest.create(exchange, codecConfigurer.getReaders());
         AtomicReference<String> requestBody = new AtomicReference<>("");
-        Mono<String> modifiedBody = serverRequest
-                .bodyToMono(String.class)
-                .flatMap(body -> {
-                    requestBody.set(body);
-                    return Mono.just(body);
-                });
+        Mono<String> modifiedBody = serverRequest.bodyToMono(String.class).flatMap(body -> {
+            requestBody.set(body);
+            return Mono.just(body);
+        });
 
         // 创建 BodyInserter 对象
-        BodyInserter<Mono<String>, ReactiveHttpOutputMessage> bodyInserter = BodyInserters.fromPublisher(
-                modifiedBody, String.class);
+        BodyInserter<Mono<String>, ReactiveHttpOutputMessage> bodyInserter = BodyInserters.fromPublisher(modifiedBody,
+                String.class);
         // 创建 CachedBodyOutputMessage 对象
         HttpHeaders headers = new HttpHeaders();
-        headers.putAll(exchange
-                .getRequest()
-                .getHeaders());
+        headers.putAll(exchange.getRequest().getHeaders());
         // the new content type will be computed by bodyInserter
         // and then set in the request decorator
         headers.remove(HttpHeaders.CONTENT_LENGTH); // 移除
         CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, headers);
         // 通过 BodyInserter 将 Request Body 写入到 CachedBodyOutputMessage 中
-        return bodyInserter
-                .insert(outputMessage, new BodyInserterContext())
-                .then(Mono.defer(() -> {
-                    // 包装 Request，用于缓存 Request Body
-                    ServerHttpRequest decoratedRequest = requestDecorate(exchange, headers, outputMessage);
-                    return validSign(
-                            exchange, chain, decoratedRequest,
-                            StringUtils.isNotBlank(requestBody.get()) ? JsonUtil.toBean(requestBody.get(), Map.class) :
-                                    new HashMap<>(), userClaim, headerMap, customizeHeaderMap
-                    );
-                }));
+        return bodyInserter.insert(outputMessage, new BodyInserterContext()).then(Mono.defer(() -> {
+            // 包装 Request，用于缓存 Request Body
+            ServerHttpRequest decoratedRequest = requestDecorate(exchange, headers, outputMessage);
+            return validSign(exchange, chain, decoratedRequest,
+                    StringUtils.isNotBlank(requestBody.get()) ? JsonUtil.toBean(requestBody.get(), Map.class) :
+                            new HashMap<>(), userClaim, headerMap, customizeHeaderMap);
+        }));
     }
 
     private Mono<Void> resolveQueryParamsSignData(ServerWebExchange exchange, GatewayFilterChain chain,
             UserClaim userClaim, Map<String, String> headerMap, Map<String, String> customizeHeaderMap) {
         final ServerHttpRequest request = exchange.getRequest();
-        final Map<String, Object> data = request
-                .getQueryParams()
-                .toSingleValueMap()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<String, Object> data = request.getQueryParams().toSingleValueMap().entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return validSign(exchange, chain, request, data, userClaim, headerMap, customizeHeaderMap);
     }
 
@@ -270,7 +200,6 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
      *
      * @param request
      * @param data
-     * @return
      */
     private Mono<Void> validSign(ServerWebExchange exchange, GatewayFilterChain chain, ServerHttpRequest request,
             Map<String, Object> data, UserClaim userClaim, Map<String, String> headerMap,
@@ -285,18 +214,15 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
         }
         final UserClaimService userClaimService = getUserClaimService();
         // 分发服务前
-        final ResponseData<Object> responseData = userClaimService.beforeDispatch(
-                exchange, chain, userClaim, headerMap, customizeHeaderMap);
+        final ResponseData<Object> responseData = userClaimService.beforeDispatch(exchange, chain, userClaim, headerMap,
+                customizeHeaderMap);
         if (!responseData.isSuccess()) {
             return responseCustomizeMsg(exchange.getResponse(), responseData);
         }
         headerMap.putAll(customizeHeaderMap);
         final ServerHttpRequest.Builder mutate = request.mutate();
         headerMap.forEach(mutate::header);
-        return chain.filter(exchange
-                .mutate()
-                .request(mutate.build())
-                .build());
+        return chain.filter(exchange.mutate().request(mutate.build()).build());
     }
 
     /**
@@ -305,7 +231,6 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
      * @param request
      * @param headers
      * @param userClaim
-     * @return
      */
     private Map<String, String> resolveClientHeaders(ServerHttpRequest request, HttpHeaders headers,
             UserClaim userClaim) {
@@ -313,11 +238,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
         // 处理客户端传递的约定好的请求头
         final Map<String, RequestHeaderEnum> clientHeaders = RequestHeaderEnum.getAllClientHeaders();
         clientHeaders.forEach((name, obj) -> {
-            clientHeaderMap.put(
-                    name, Optional
-                            .ofNullable(headers.getFirst(name))
-                            .orElse(obj.getDefaultValue())
-            );
+            clientHeaderMap.put(name, Optional.ofNullable(headers.getFirst(name)).orElse(obj.getDefaultValue()));
         });
         return clientHeaderMap;
     }
@@ -327,7 +248,6 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
      *
      * @param exchange
      * @param userClaim
-     * @return
      */
     private Map<String, String> resolveServerHeaders(ServerWebExchange exchange, UserClaim userClaim) {
         Map<String, String> serverHeaderMap = new HashMap<>();
@@ -335,18 +255,14 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
         final HttpHeaders headers = request.getHeaders();
         // 处理服务端内部的请求头
         serverHeaderMap.put(RequestHeaderEnum.CLIENT_IP_FROM_GATEWAY.getName(), getClientIp(request));
-        serverHeaderMap.put(
-                RequestHeaderEnum.USER_ID_FROM_GATEWAY.getName(),
-                Objects.nonNull(userClaim) ? userClaim.getUserId() : headers.getFirst(RequestHeaderEnum.IMEI.getName())
-        );
-        serverHeaderMap.put(
-                RequestHeaderEnum.IS_GATEWAY_DISPATCH.getName(),
-                RequestHeaderEnum.IS_GATEWAY_DISPATCH.getDefaultValue()
-        );
-        serverHeaderMap.put(
-                RequestHeaderEnum.TRACE_ID_FROM_GATEWAY.getName(), generateTraceId(
-                        Objects.nonNull(userClaim) ? userClaim.getUserId() : headers.getFirst(RequestHeaderEnum.IMEI.getName()))
-        );
+        serverHeaderMap.put(RequestHeaderEnum.USER_ID_FROM_GATEWAY.getName(),
+                Objects.nonNull(userClaim) ? userClaim.getUserId() :
+                        headers.getFirst(RequestHeaderEnum.IMEI.getName()));
+        serverHeaderMap.put(RequestHeaderEnum.IS_GATEWAY_DISPATCH.getName(),
+                RequestHeaderEnum.IS_GATEWAY_DISPATCH.getDefaultValue());
+        serverHeaderMap.put(RequestHeaderEnum.TRACE_ID_FROM_GATEWAY.getName(), generateTraceId(
+                Objects.nonNull(userClaim) ? userClaim.getUserId() :
+                        headers.getFirst(RequestHeaderEnum.IMEI.getName())));
         return serverHeaderMap;
     }
 
@@ -369,20 +285,13 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
      *
      * @param response
      * @param bizCode
-     * @return
      */
     private Mono<Void> responseErrorJson(HttpHeaders headers, ServerHttpResponse response, BaseCallbackCode bizCode) {
-        log.error(
-                "网关处理失败, code = {}, message = {}, headers = {}", bizCode.getCode(), bizCode.getDescription(),
-                resolveAllClientHeader(headers)
-        );
-        response
-                .getHeaders()
-                .add("Content-Type", "application/json;charset=UTF-8");
+        log.error("网关处理失败, code = {}, message = {}, headers = {}", bizCode.getCode(), bizCode.getDescription(),
+                resolveAllClientHeader(headers));
+        response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
         String result = JsonUtil.toJson(ResponseData.failure(bizCode));
-        DataBuffer buffer = response
-                .bufferFactory()
-                .wrap(result.getBytes(StandardCharsets.UTF_8));
+        DataBuffer buffer = response.bufferFactory().wrap(result.getBytes(StandardCharsets.UTF_8));
         return response.writeWith(Flux.just(buffer));
     }
 
@@ -391,17 +300,10 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
      *
      * @param response
      * @param data
-     * @return
      */
     public Mono<Void> responseCustomizeMsg(ServerHttpResponse response, ResponseData<Object> data) {
-        response
-                .getHeaders()
-                .add("Content-Type", "application/json;charset=UTF-8");
-        DataBuffer buffer = response
-                .bufferFactory()
-                .wrap(JsonUtil
-                        .toJson(data)
-                        .getBytes(StandardCharsets.UTF_8));
+        response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
+        DataBuffer buffer = response.bufferFactory().wrap(JsonUtil.toJson(data).getBytes(StandardCharsets.UTF_8));
         return response.writeWith(Flux.just(buffer));
     }
 
@@ -410,7 +312,6 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
      *
      * @param exchange
      * @param tokenHeader
-     * @return
      */
     private UserClaim checkAndParseAuthInfo(ServerWebExchange exchange, String tokenHeader) {
         final ServerHttpRequest request = exchange.getRequest();
@@ -423,7 +324,7 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
         if (StringUtils.isNotBlank(cloudAuthenticationProperties.getTokenPrefix())) {
             token = tokenHeader.split(tokenPrefix)[1];
         }
-        AuthenticateCheckResult authenticateCheckResult = TokenUtil.checkToken(token);
+        AuthenticateCheckResult authenticateCheckResult = tokenGenerator.checkToken(token);
         tokenUserClaim = authenticateCheckResult.getUserClaim();
         // 额外业务token校验规则
         return tokenCustomizeCheckService.customizeCheck(exchange, authenticateCheckResult);
@@ -433,7 +334,6 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
      * 生成traceId
      *
      * @param userId
-     * @return
      */
     private String generateTraceId(String userId) {
         return String.join("-", userId, IdsUtil.getNextStrId());
@@ -444,8 +344,8 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
     /**
      * 请求装饰器，支持重新计算 headers、body 缓存
      *
-     * @param exchange      请求
-     * @param headers       请求头
+     * @param exchange 请求
+     * @param headers 请求头
      * @param outputMessage body 缓存
      * @return 请求装饰器
      */
@@ -477,8 +377,6 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
 
     /**
      * 获取用户认证service
-     *
-     * @return
      */
     public UserClaimService getUserClaimService() {
         final UserClaimService userClaimService = userClaimServiceObjectProvider.getIfAvailable();
@@ -486,5 +384,46 @@ public class CloudHavenGatewayFilter implements GlobalFilter {
             throw new NoSuchBeanDefinitionException("UserClaimService not config");
         }
         return userClaimService;
+    }
+
+    /**
+     * 获取客户端请求ip
+     *
+     * @param request
+     */
+    public static String getClientIp(ServerHttpRequest request) {
+        final HttpHeaders headers = request.getHeaders();
+        String ip = headers.getFirst("X-Forwarded-For");
+        if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip) && ip.contains(",")) {
+            ip = ip.split(",")[0];
+        }
+
+        if (isInvalidIp(ip)) {
+            ip = headers.getFirst("X-Real-IP");
+        }
+
+        if (isInvalidIp(ip)) {
+            ip = headers.getFirst("Proxy-Client-IP");
+        }
+
+        if (isInvalidIp(ip)) {
+            ip = headers.getFirst("WL-Proxy-Client-IP");
+        }
+
+        if (isInvalidIp(ip)) {
+            ip = headers.getFirst("HTTP_CLIENT_IP");
+        }
+
+        if (isInvalidIp(ip)) {
+            ip = headers.getFirst("HTTP_X_FORWARDED_FOR");
+        }
+        if (isInvalidIp(ip) && request.getRemoteAddress() != null) {
+            ip = request.getRemoteAddress().getAddress().getHostAddress();
+        }
+        return ip;
+    }
+
+    private static boolean isInvalidIp(String ip) {
+        return ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
     }
 }

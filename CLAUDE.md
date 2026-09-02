@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Cloud Haven (`cloud-haven`) is a Spring Cloud Alibaba microservices framework. It provides common modules for microservice architectures, including API definitions, core services, authentication filters, and gateway configuration.
 
 **Tech Stack:**
+
 - Java 17
 - Spring Boot 3.3.5
 - Spring Cloud 2025.0.0
@@ -34,12 +35,12 @@ mvn dependency:tree
 
 ## Module Structure
 
-| Module | Purpose |
-|--------|---------|
-| `api` | Shared DTOs, interfaces, configuration properties |
-| `core` | Core implementation: config, service discovery, Feign, thread pools |
-| `authentication` | Server-side authentication interceptor (Servlet) |
-| `gateway` | Reactive gateway service |
+| Module           | Purpose                                                             |
+|------------------|---------------------------------------------------------------------|
+| `api`            | Shared DTOs, interfaces, configuration properties                   |
+| `core`           | Core implementation: config, service discovery, Feign, thread pools |
+| `authentication` | Server-side authentication interceptor (Servlet)                    |
+| `gateway`        | Reactive gateway service                                            |
 
 ## Authentication Flow
 
@@ -48,12 +49,14 @@ Client → Gateway (CloudHavenGatewayFilter) → Backend Service (ServerAuthenti
 ```
 
 **Gateway Filter** (`gateway/.../handler/CloudHavenGatewayFilter.java`):
+
 - Global reactive filter
 - Token validation, signature verification
 - Mock user support, trace ID generation
 - Uses LMAX Disruptor for async logging
 
 **Server Filter** (`authentication/.../filter/ServerAuthenticateTokenFilter.java`):
+
 - `HandlerInterceptor` implementation
 - Parses request context with MDC: userId, traceId, clientIp, imei
 
@@ -61,14 +64,14 @@ Client → Gateway (CloudHavenGatewayFilter) → Backend Service (ServerAuthenti
 
 Prefix: `customizer.cloud.authentication`
 
-| Property | Description |
-|----------|-------------|
-| `token-header-name` | Header name for access token (default: `access_token`) |
-| `ignores` | Endpoints that require authentication but bypass token check |
-| `open-ignores` | Completely open endpoints (no auth required) |
-| `mock` | Enable mock login (non-production only) |
-| `sign-enabled` | Enable request signature verification |
-| `sign-secret` | Signature secret key |
+| Property            | Description                                                  |
+|---------------------|--------------------------------------------------------------|
+| `token-header-name` | Header name for access token (default: `access_token`)       |
+| `ignores`           | Endpoints that require authentication but bypass token check |
+| `open-ignores`      | Completely open endpoints (no auth required)                 |
+| `mock`              | Enable mock login (non-production only)                      |
+| `sign-enabled`      | Enable request signature verification                        |
+| `sign-secret`       | Signature secret key                                         |
 
 ## Package Convention
 
@@ -84,13 +87,13 @@ com.snowball.cloud.haven.{module}
 
 ## Key Source Files
 
-| File | Purpose |
-|------|---------|
-| `gateway/.../handler/CloudHavenGatewayFilter.java` | Gateway authentication filter |
-| `gateway/.../config/AuthenticationAutoConfiguration.java` | Gateway auto-config |
-| `authentication/.../filter/ServerAuthenticateTokenFilter.java` | Server-side auth interceptor |
-| `authentication/.../config/ServerAuthenticationAutoConfiguration.java` | Server auto-config |
-| `api/.../CloudAuthenticationProperties.java` | Auth configuration properties |
+| File                                                                   | Purpose                       |
+|------------------------------------------------------------------------|-------------------------------|
+| `gateway/.../handler/CloudHavenGatewayFilter.java`                     | Gateway authentication filter |
+| `gateway/.../config/AuthenticationAutoConfiguration.java`              | Gateway auto-config           |
+| `authentication/.../filter/ServerAuthenticateTokenFilter.java`         | Server-side auth interceptor  |
+| `authentication/.../config/ServerAuthenticationAutoConfiguration.java` | Server auto-config            |
+| `api/.../CloudAuthenticationProperties.java`                           | Auth configuration properties |
 
 ## Dependency Notes
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <groupId>io.github.dongfangding</groupId>
     <artifactId>cloud-haven</artifactId>
     <modelVersion>4.0.0</modelVersion>
@@ -46,7 +46,7 @@
     -->
     <properties>
         <!-- Project revision -->
-        <revision>boot3.5-2025.1-SNAPSHOT</revision>
+        <revision>boot3.5-2026.1-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -72,7 +72,7 @@
         <!-- 自身依赖pom版本 -->
         <spring.cloud.version>2025.0.0</spring.cloud.version>
         <spring.cloud.alibaba.version>2025.0.0.0</spring.cloud.alibaba.version>
-        <ddf-common.version>boot3.5-2025.1-SNAPSHOT</ddf-common.version>
+        <ddf-common.version>boot3.5-2026.1-SNAPSHOT</ddf-common.version>
     </properties>
 
     <!--维护依赖-->

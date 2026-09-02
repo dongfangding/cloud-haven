@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>io.github.dongfangding</groupId>
         <artifactId>cloud-haven</artifactId>
@@ -7,7 +7,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>core</artifactId>
+    <artifactId>cloud-haven-core</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
 
@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>io.github.dongfangding</groupId>
-            <artifactId>cloud-haven-api</artifactId>
+            <artifactId>api</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>

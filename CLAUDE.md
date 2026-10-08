@@ -99,7 +99,7 @@ com.snowball.cloud.haven.{module}
 
 - Project depends on internal `ddf-common` framework modules (`ddf-common-api`, `ddf-common-mvc`, `ddf-common-core`)
 - `api` module defines interfaces only, no implementation
-- All version management is in root `pom.xml`
+- Dependency version management lives in `cloud-haven-dependency` (the BOM; external consumers import this coordinate, not the root pom); the root pom inherits build/release config from `ddf-common-parent` (compiler, flatten, release profile, `spring-boot.version` baseline) — do not duplicate them locally
 
 ## Code Conventions
 

@@ -2,37 +2,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- parent 版本必须是具体值：仓库解析 parent 时不会插值 ${revision}（相对路径方式才行），
+         每次升版本需与下方 revision 属性保持同步。ddf-common 已发布 boot3.5-2026.1.RELEASE，
+         云骨架跟随 RELEASE 基线，消费方无需依赖 SNAPSHOT 仓库 -->
+    <parent>
+        <groupId>io.github.dongfangding</groupId>
+        <artifactId>ddf-common-parent</artifactId>
+        <version>boot3.5-2026.1.RELEASE</version>
+        <relativePath/>
+    </parent>
+
     <groupId>io.github.dongfangding</groupId>
     <artifactId>cloud-haven</artifactId>
-    <modelVersion>4.0.0</modelVersion>
     <version>${revision}</version>
     <packaging>pom</packaging>
     <name>Spring Cloud骨架</name>
     <description>基于https://github.com/dongfangding/ddf-common作为Spring Boot脚手架，构建起来的Spring Cloud骨架
     </description>
     <url>https://github.com/dongfangding/cloud-haven</url>
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
 
+    <!-- scm 必须覆盖：parent（ddf-common-parent）的 scm 指向 ddf-common 仓库。
+         licenses / developers 与 parent 完全一致，直接继承，不再重复声明。
+         统一编译配置（compiler）、flatten、release profile（javadoc/gpg/central-publishing）、
+         spring-boot.version 基线全部继承自 ddf-common-parent，本文件不再声明。 -->
     <scm>
         <url>https://github.com/dongfangding/cloud-haven</url>
         <connection>scm:git:git://github.com/dongfangding/cloud-haven.git</connection>
         <developerConnection>scm:git:ssh://github.com/dongfangding/cloud-haven.git</developerConnection>
     </scm>
-
-    <developers>
-        <developer>
-            <id>snowball</id>
-            <name>snowball</name>
-            <email>dongfang.ding1@gmail.com</email>
-            <organization>snowball</organization>
-        </developer>
-    </developers>
 
     <!--
     spring-boot spring-cloud spring-cloud-alibaba 版本依赖关系
@@ -45,59 +44,22 @@
     2025.0.0.0                      1.8.9               3.0.3           5.3.1               2.5.0
     -->
     <properties>
-        <!-- Project revision -->
+        <!-- Project revision（parent 的 ${revision} 解析也取自此处） -->
         <revision>boot3.5-2026.1-SNAPSHOT</revision>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>17</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.test.skip>true</maven.test.skip>
-        <!-- maven版本使用3.9.6以上版本 -->
-        <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
+        <!-- 日常构建插件版本（编译插件版本、发布插件版本在 ddf-common-parent 统一维护） -->
         <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
         <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
         <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
-        <maven.archetype.plugin.version>3.3.0</maven.archetype.plugin.version>
-        <maven.javadoc.plugin.version>3.12.0</maven.javadoc.plugin.version>
-        <maven.release.plugin.version>3.3.0</maven.release.plugin.version>
-        <maven.deploy.plugin.version>3.1.4</maven.deploy.plugin.version>
-        <maven.sonar.plugin.version>5.5.0.6356</maven.sonar.plugin.version>
-        <!-- 发布插件版本 -->
-        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
-        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
-        <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
-        <flatten-maven-plugin.version>1.7.0</flatten-maven-plugin.version>
-        <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
-        <native-maven-plugin.version>0.10.6</native-maven-plugin.version>
-        <!-- 自身依赖pom版本 -->
-        <spring.cloud.version>2025.0.0</spring.cloud.version>
-        <spring.cloud.alibaba.version>2025.0.0.0</spring.cloud.alibaba.version>
-        <ddf-common.version>boot3.5-2026.1-SNAPSHOT</ddf-common.version>
     </properties>
 
-    <!--维护依赖-->
+    <!--维护依赖：对外导入统一走 cloud-haven-dependency 坐标，不直接暴露本 pom-->
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring.cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>${spring.cloud.alibaba.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>io.github.dongfangding</groupId>
-                <artifactId>ddf-common</artifactId>
-                <version>${ddf-common.version}</version>
+                <artifactId>cloud-haven-dependency</artifactId>
+                <version>${revision}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -106,6 +68,7 @@
 
 
     <modules>
+        <module>cloud-haven-dependency</module>
         <module>api</module>
         <module>core</module>
         <module>authentication</module>
@@ -117,7 +80,7 @@
         <!--        <repository>-->
         <!--            <id>aiyu_public</id>-->
         <!--            &lt;!&ndash; 这里要和settings里的mirrors节点下的某一个mirror的url对应起来， 一般在settings.xml中配置的这个地址，都是在nexus中的一个group地址，-->
-        <!--             然后将自己私服的release库地址和snapshot库地址都添加到这个组中， 即上面<distributionManagement>下<repository>和<snapshotRepository>&ndash;&gt;-->
+        <!--             然后将自己私服的release库地址和snapshot库地址都添加到这个组中， 即上面<distributionManagement>下<repository>和<snapshotRepository>-->
         <!--            <url>http://xxxx:8802/repository/aiyu_public/</url>-->
         <!--            <releases>-->
         <!--                <enabled>true</enabled>-->
@@ -157,8 +120,6 @@
         <!--            </releases>-->
         <!--            <snapshots>-->
         <!--                <enabled>true</enabled>-->
-        <!--                <updatePolicy>always</updatePolicy>-->
-        <!--                <checksumPolicy>fail</checksumPolicy>-->
         <!--            </snapshots>-->
         <!--        </pluginRepository>-->
         <pluginRepository>
@@ -219,28 +180,6 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.plugin.version}</version>
-                    <configuration>
-                        <parameters>true</parameters>
-                        <source>${maven.compiler.source}</source>
-                        <target>${maven.compiler.target}</target>
-                        <release>${java.version}</release>
-                        <encoding>${project.build.sourceEncoding}</encoding>
-                        <annotationProcessorPaths>
-                            <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                            </path>
-                        </annotationProcessorPaths>
-                        <compilerArgs>
-                            <arg>-parameters</arg>
-                        </compilerArgs>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>${maven.source.plugin.version}</version>
                     <executions>
@@ -279,93 +218,6 @@
         </plugins>
     </build>
 
-    <!-- 默认不启动发布插件，当需要的时候，激活这个profile -->
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <!-- Javadoc -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${maven-javadoc-plugin.version}</version>
-                        <configuration>
-                            <doclint>none</doclint>
-                            <source>${maven.compiler.source}</source>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- 用于发布到maven中央仓库的插件， 对文件进行gpg签名。如果要deploy到私服， 自己的项目里不要引用这个 -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven-gpg-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>flatten-maven-plugin</artifactId>
-                        <version>${flatten-maven-plugin.version}</version>
-                        <configuration>
-                            <updatePomFile>true</updatePomFile>
-                            <flattenMode>resolveCiFriendliesOnly</flattenMode>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>flatten</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>flatten</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>flatten.clean</id>
-                                <phase>clean</phase>
-                                <goals>
-                                    <goal>clean</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- 用于发布到maven中央仓库的插件，将文件推送到中央仓库，使用该插件，不需要在distributionManagement中配置仓库地址。如果要deploy到私服， 自己的项目里不要引用这个 -->
-                    <plugin>
-                        <groupId>org.sonatype.central</groupId>
-                        <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>${central-publishing-maven-plugin.version}</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <!-- publishingServerId里的值要对应本地settings.xml中的server认证信息的id， 用户名和密码要真实到中央仓库账号注册过 -->
-                            <publishingServerId>snowball</publishingServerId>
-                            <!-- 自动发布， 否则就要登录账号收到点击发布 -->
-                            <autoPublish>false</autoPublish>
-                            <excludeArtifacts>
-                                <!-- 排除的Artifact，比如有example模块是 -->
-                                <excludeArtifact>ddf-common-script</excludeArtifact>
-                            </excludeArtifacts>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+    <!-- release profile 继承自 ddf-common-parent（javadoc / gpg / flatten / central-publishing），
+         发布时 mvn -Prelease clean deploy；excludeArtifacts 中的 ddf-common-script 等与本项目无关，不影响 -->
 </project>

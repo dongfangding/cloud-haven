@@ -13,17 +13,10 @@
     <artifactId>cloud-haven-authentication</artifactId>
     <version>${revision}</version>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-        <cloud-api.version>${revision}</cloud-api.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.github.dongfangding</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>cloud-haven-api</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
@@ -37,7 +30,6 @@
         <dependency>
             <groupId>io.github.dongfangding</groupId>
             <artifactId>ddf-common-mvc</artifactId>
-            <version>${ddf-common.version}</version>
         </dependency>
     </dependencies>
 

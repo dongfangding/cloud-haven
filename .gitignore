@@ -49,3 +49,4 @@ build/
 .claude/skills/explore-codebase
 .claude/skills/refactor-safely
 .claude/skills/review-changes
+.flattened-pom.xml

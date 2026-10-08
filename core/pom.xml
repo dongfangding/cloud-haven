@@ -11,27 +11,19 @@
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.github.dongfangding</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>cloud-haven-api</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>io.github.dongfangding</groupId>
             <artifactId>ddf-common-api</artifactId>
-            <version>${ddf-common.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.dongfangding</groupId>
             <artifactId>ddf-common-mvc</artifactId>
-            <version>${ddf-common.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -53,7 +45,6 @@
         <dependency>
             <groupId>io.github.dongfangding</groupId>
             <artifactId>ddf-common-log4j</artifactId>
-            <version>${ddf-common.version}</version>
         </dependency>
     </dependencies>
 </project>

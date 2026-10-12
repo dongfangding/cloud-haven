@@ -12,6 +12,8 @@
 
     <artifactId>cloud-haven-gateway</artifactId>
     <version>${revision}</version>
+    <name>cloud-haven-gateway</name>
+    <description>Gateway module of cloud-haven</description>
 
     <dependencies>
         <dependency>

@@ -11,6 +11,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-haven-api</artifactId>
     <version>${revision}</version>
+    <name>cloud-haven-api</name>
+    <description>APIs for cloud-haven</description>
     <packaging>jar</packaging>
 
     <dependencies>

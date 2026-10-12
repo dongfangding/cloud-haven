@@ -9,6 +9,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-haven-core</artifactId>
     <version>${revision}</version>
+    <name>cloud-haven-core</name>
+    <description>Core module of cloud-haven</description>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -12,6 +12,8 @@
 
     <artifactId>cloud-haven-authentication</artifactId>
     <version>${revision}</version>
+    <name>cloud-haven-authentication</name>
+    <description>Authentication services for user management and access control.</description>
 
     <dependencies>
         <dependency>

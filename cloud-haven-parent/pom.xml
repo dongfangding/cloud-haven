@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- parent 版本必须是具体值：仓库解析 parent 时不会插值 ${revision}（相对路径方式才行），
+         ddf-common 升版后需同步此处 -->
+    <parent>
+        <groupId>io.github.dongfangding</groupId>
+        <artifactId>ddf-common-parent</artifactId>
+        <version>boot3.5.16-2026.1.RELEASE</version>
+        <relativePath/>
+    </parent>
+
+    <artifactId>cloud-haven-parent</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+    <name>cloud-haven-parent</name>
+    <description>cloud-haven 构建父 pom：持有本项目独立 revision 与 scm，编译/flatten/central 发布配置全部继承自 ddf-common-parent，零插件重复。</description>
+    <url>https://github.com/dongfangding/cloud-haven</url>
+
+    <!-- scm 必须覆盖：parent（ddf-common-parent）的 scm 指向 ddf-common 仓库。
+         licenses / developers 与 ddf-common-parent 完全一致，直接继承，不再重复声明。
+         统一编译配置（compiler）、flatten、central profile（javadoc/gpg/central-publishing）、
+         spring-boot.version 基线全部继承自 ddf-common-parent，本文件不再声明 -->
+    <scm>
+        <url>https://github.com/dongfangding/cloud-haven</url>
+        <connection>scm:git:git://github.com/dongfangding/cloud-haven.git</connection>
+        <developerConnection>scm:git:ssh://github.com/dongfangding/cloud-haven.git</developerConnection>
+    </scm>
+
+    <properties>
+        <!-- Project revision：cloud-haven 独立版本线，与 ddf-common 解耦。
+             单独修复本项目只需升此处并发布 cloud-haven 各模块，无需重发 ddf-common -->
+        <revision>boot3.5.16-2026.1.RELEASE</revision>
+    </properties>
+</project>

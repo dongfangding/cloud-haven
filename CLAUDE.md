@@ -37,6 +37,8 @@ mvn dependency:tree
 
 | Module           | Purpose                                                             |
 |------------------|---------------------------------------------------------------------|
+| `cloud-haven-parent` | Build parent: own `revision` + scm, inherits compiler/flatten/central profile from ddf-common-parent |
+| `cloud-haven-dependency` | BOM: external consumers import this coordinate                    |
 | `api`            | Shared DTOs, interfaces, configuration properties                   |
 | `core`           | Core implementation: config, service discovery, Feign, thread pools |
 | `authentication` | Server-side authentication interceptor (Servlet)                    |
@@ -99,7 +101,7 @@ com.snowball.cloud.haven.{module}
 
 - Project depends on internal `ddf-common` framework modules (`ddf-common-api`, `ddf-common-mvc`, `ddf-common-core`)
 - `api` module defines interfaces only, no implementation
-- Dependency version management lives in `cloud-haven-dependency` (the BOM; external consumers import this coordinate, not the root pom); the root pom inherits build/release config from `ddf-common-parent` (compiler, flatten, release profile, `spring-boot.version` baseline) — do not duplicate them locally
+- Dependency version management lives in `cloud-haven-dependency` (the BOM; external consumers import this coordinate, not the root pom); the build/release config chain is `cloud-haven-parent` (holds this project's own `revision` + scm, versions independently of ddf-common) → `ddf-common-parent` (compiler, flatten, central release profile, `spring-boot.version` baseline) — do not duplicate them locally
 
 ## Code Conventions
 

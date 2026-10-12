@@ -4,14 +4,13 @@
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- parent 版本必须是具体值：仓库解析 parent 时不会插值 ${revision}（相对路径方式才行），
-         每次升版本需与下方 revision 属性保持同步。ddf-common 已发布 boot3.5-2026.1.RELEASE，
-         云骨架跟随 RELEASE 基线，消费方无需依赖 SNAPSHOT 仓库 -->
+    <!-- 以 cloud-haven-parent 为 parent（relativePath 解析，${revision} 可插值）；
+         cloud-haven-parent 再以具体版本继承 ddf-common-parent，版本与构建配置的单层来源 -->
     <parent>
         <groupId>io.github.dongfangding</groupId>
-        <artifactId>ddf-common-parent</artifactId>
-        <version>boot3.5-2026.1.RELEASE</version>
-        <relativePath/>
+        <artifactId>cloud-haven-parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>cloud-haven-parent/pom.xml</relativePath>
     </parent>
 
     <groupId>io.github.dongfangding</groupId>
@@ -22,16 +21,6 @@
     <description>基于https://github.com/dongfangding/ddf-common作为Spring Boot脚手架，构建起来的Spring Cloud骨架
     </description>
     <url>https://github.com/dongfangding/cloud-haven</url>
-
-    <!-- scm 必须覆盖：parent（ddf-common-parent）的 scm 指向 ddf-common 仓库。
-         licenses / developers 与 parent 完全一致，直接继承，不再重复声明。
-         统一编译配置（compiler）、flatten、release profile（javadoc/gpg/central-publishing）、
-         spring-boot.version 基线全部继承自 ddf-common-parent，本文件不再声明。 -->
-    <scm>
-        <url>https://github.com/dongfangding/cloud-haven</url>
-        <connection>scm:git:git://github.com/dongfangding/cloud-haven.git</connection>
-        <developerConnection>scm:git:ssh://github.com/dongfangding/cloud-haven.git</developerConnection>
-    </scm>
 
     <!--
     spring-boot spring-cloud spring-cloud-alibaba 版本依赖关系
@@ -44,8 +33,6 @@
     2025.0.0.0                      1.8.9               3.0.3           5.3.1               2.5.0
     -->
     <properties>
-        <!-- Project revision（parent 的 ${revision} 解析也取自此处） -->
-        <revision>boot3.5-2026.1-SNAPSHOT</revision>
         <maven.test.skip>true</maven.test.skip>
         <!-- 日常构建插件版本（编译插件版本、发布插件版本在 ddf-common-parent 统一维护） -->
         <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
@@ -68,6 +55,7 @@
 
 
     <modules>
+        <module>cloud-haven-parent</module>
         <module>cloud-haven-dependency</module>
         <module>api</module>
         <module>core</module>
@@ -76,40 +64,40 @@
     </modules>
 
 
-    <repositories>
-        <!--        <repository>-->
-        <!--            <id>aiyu_public</id>-->
-        <!--            &lt;!&ndash; 这里要和settings里的mirrors节点下的某一个mirror的url对应起来， 一般在settings.xml中配置的这个地址，都是在nexus中的一个group地址，-->
-        <!--             然后将自己私服的release库地址和snapshot库地址都添加到这个组中， 即上面<distributionManagement>下<repository>和<snapshotRepository>-->
-        <!--            <url>http://xxxx:8802/repository/aiyu_public/</url>-->
-        <!--            <releases>-->
-        <!--                <enabled>true</enabled>-->
-        <!--            </releases>-->
-        <!--            <snapshots>-->
-        <!--                <enabled>true</enabled>-->
-        <!--                <updatePolicy>always</updatePolicy>-->
-        <!--                <checksumPolicy>fail</checksumPolicy>-->
-        <!--            </snapshots>-->
-        <!--        </repository>-->
-        <repository>
-            <id>aliyun</id>
-            <url>https://maven.aliyun.com/repository/public</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>public</id>
-            <name>huawei nexus</name>
-            <url>https://mirrors.huaweicloud.com/repository/maven/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
+<!--    <repositories>-->
+<!--        &lt;!&ndash;        <repository>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <id>aiyu_public</id>&ndash;&gt;-->
+<!--        &lt;!&ndash;            &lt;!&ndash; 这里要和settings里的mirrors节点下的某一个mirror的url对应起来， 一般在settings.xml中配置的这个地址，都是在nexus中的一个group地址，&ndash;&gt;-->
+<!--        &lt;!&ndash;             然后将自己私服的release库地址和snapshot库地址都添加到这个组中， 即上面<distributionManagement>下<repository>和<snapshotRepository>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <url>http://xxxx:8802/repository/aiyu_public/</url>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <releases>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <enabled>true</enabled>&ndash;&gt;-->
+<!--        &lt;!&ndash;            </releases>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <snapshots>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <enabled>true</enabled>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <updatePolicy>always</updatePolicy>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <checksumPolicy>fail</checksumPolicy>&ndash;&gt;-->
+<!--        &lt;!&ndash;            </snapshots>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </repository>&ndash;&gt;-->
+<!--        <repository>-->
+<!--            <id>aliyun</id>-->
+<!--            <url>https://maven.aliyun.com/repository/public</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--            </snapshots>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--            </releases>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>public</id>-->
+<!--            <name>huawei nexus</name>-->
+<!--            <url>https://mirrors.huaweicloud.com/repository/maven/</url>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--            </releases>-->
+<!--        </repository>-->
+<!--    </repositories>-->
 
     <pluginRepositories>
         <!--        <pluginRepository>-->
@@ -218,6 +206,13 @@
         </plugins>
     </build>
 
-    <!-- release profile 继承自 ddf-common-parent（javadoc / gpg / flatten / central-publishing），
-         发布时 mvn -Prelease clean deploy；excludeArtifacts 中的 ddf-common-script 等与本项目无关，不影响 -->
+    <!-- central profile 继承自 ddf-common-parent（javadoc / gpg / flatten / central-publishing），
+         发布时 mvn -Pcentral clean deploy；excludeArtifacts 中的 ddf-common-script 等与本项目无关，不影响。
+         这里的空壳同名 profile 仅用于让 IDEA Maven 面板显示 central 勾选项（IDEA 不展示父 pom 继承的
+         profile）；Maven 对父子同名 profile 是合并语义，父里的插件配置不受影响 -->
+    <profiles>
+        <profile>
+            <id>central</id>
+        </profile>
+    </profiles>
 </project>

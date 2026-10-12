@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.dongfangding</groupId>
+        <artifactId>cloud-haven-parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>../cloud-haven-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>cloud-haven-dependency</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+    <name>cloud-haven-dependency</name>
+    <description>Bill of materials for cloud-haven modules and managed dependency versions.</description>
+
+    <properties>
+        <!-- 外部 BOM 版本：对外消费方 import 本坐标后，cloud-haven 模块与全套依赖版本一次管齐。
+             2025.0.3 为 Spring Cloud 2025.0 线收官版（配套 Boot 3.5.x，该线 OSS 支持已结束，下一迭代评估升 2025.1/Boot 4 线） -->
+        <spring.cloud.version>2025.0.3</spring.cloud.version>
+        <spring.cloud.alibaba.version>2025.0.0.0</spring.cloud.alibaba.version>
+        <ddf-common.version>boot3.5.16-2026.1.RELEASE</ddf-common.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- cloud-haven 自有模块坐标统管：消费方 import 本 BOM 后，引入这些模块无需指定版本 -->
+            <dependency>
+                <groupId>io.github.dongfangding</groupId>
+                <artifactId>cloud-haven-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.dongfangding</groupId>
+                <artifactId>cloud-haven-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.dongfangding</groupId>
+                <artifactId>cloud-haven-authentication</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.dongfangding</groupId>
+                <artifactId>cloud-haven-gateway</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- Spring Cloud -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Cloud Alibaba -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring.cloud.alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- ddf-common：对外统一入口坐标，不 import ddf-common 根坐标 -->
+            <dependency>
+                <groupId>io.github.dongfangding</groupId>
+                <artifactId>ddf-common-dependency</artifactId>
+                <version>${ddf-common.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
